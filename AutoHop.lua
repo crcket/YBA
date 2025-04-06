@@ -1,4 +1,4 @@
-repeat task.wait() until game:IsLoaded() 
+repeat task.wait() until game:IsLoaded()
 if game.PlaceId ~= 2809202155 then return end
 	
 game:GetService("RunService"):Set3dRenderingEnabled(true)
