@@ -223,7 +223,6 @@ itemSpawns.ChildAdded:Connect(function(item)
 		isNotOnAlready = false
 		plr.Character.HumanoidRootPart.CFrame = item.PrimaryPart.CFrame
 		task.wait(0.25)
-		plr.Character.HumanoidRootPart.CFrame = item.PrimaryPart.CFrame
 		firesignal(item:FindFirstChildWhichIsA("ProximityPrompt").Triggered)
 		spawn(function()
 			task.wait(2) 
