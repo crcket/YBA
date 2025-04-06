@@ -1,4 +1,4 @@
-repeat task.wait() until game:IsLoaded() 
+repeat task.wait() until game:IsLoaded()
 if game.PlaceId ~= 2809202155 then return end
 	
 game:GetService("RunService"):Set3dRenderingEnabled(true)
@@ -195,7 +195,7 @@ if screen then
 	replacementFireSignal(plrGui:WaitForChild("LoadingScreen1").Frame.LoadingFrame.BarFrame.Skip.TextButton.MouseButton1Click)()
 	task.wait(4)
 	replacementFireSignal(plrGui:WaitForChild("LoadingScreen"):WaitForChild("Frames"):WaitForChild("Main"):WaitForChild("Play").MouseButton1Click)()
-	task.wait(.1)
+	task.wait(0.1)
 	replacementFireSignal(plrGui.LoadingScreen.Frames.Gamemodes.MainGame.Play.MouseButton1Click)()
 	loaded = true
 end
@@ -210,7 +210,7 @@ end
 
 if not getgenv().Settings.AutoFarm then return end
 
-repeat task.wait(1) until loaded
+repeat task.wait(0.5) until loaded
 
 setup()
 
