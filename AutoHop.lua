@@ -222,7 +222,7 @@ itemSpawns.ChildAdded:Connect(function(item)
 	if getgenv().Settings.AutoFarm and item.PrimaryPart and item:FindFirstChild("ProximityPrompt __") then
 		isNotOnAlready = false
 		plr.Character.HumanoidRootPart.CFrame = item.PrimaryPart.CFrame
-		task.wait(0.25)
+		task.wait(0.20)
 		firesignal(item:FindFirstChildWhichIsA("ProximityPrompt").Triggered)
 		spawn(function()
 			task.wait(2) 
