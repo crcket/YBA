@@ -63,7 +63,7 @@ local function sendWebhook()
 		Url = `https://thumbnails.roblox.com/v1/users/avatar-headshot?userIds={plr.UserId}&size=48x48&format=png`
 	})
 	local body = (game:GetService("HttpService"):JSONDecode(req.Body))
-	local webhookUrl = "https://discord.com/api/webhooks/1358095722376855693/9_uvktAeTIHXTdLY8Udt0MJ5Lm1QVNBzbEtoGgiZZ0K6JxVdafJoLisnf4Nq1rWLp0da"
+	local webhookUrl = getgenv().Settings.URL
 	request({
 		Url = webhookUrl,
 		Method = "POST",
