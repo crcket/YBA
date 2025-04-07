@@ -1,3 +1,10 @@
+getgenv().Settings = {
+    AutoFarm = true;
+    SellAll = true; -- if true, sells all items every 12 seconds. if not, only sells if reach max items
+	URL = "https://discord.com/api/webhooks/1358889744846557215/TvX6k53Tp4bBQOtX-4SSUvHcHnUDsBq5qGuqSLaQJblLdwNwZ02KXnKT7daLAzxJERLa"
+}
+
+
 repeat task.wait() until game:IsLoaded()
 if game.PlaceId ~= 2809202155 then return end
 	
@@ -59,6 +66,14 @@ local function serverHop()
 end
 
 local function sendWebhook()
+
+
+    local lCount = 1;
+    for _,lucky in pairs(plr.Backpack:GetChildren()) do
+        if lucky.Name == "Lucky Arrow" then
+            lCount +=1
+        end
+    end
 	local req = request({
 		Url = `https://thumbnails.roblox.com/v1/users/avatar-headshot?userIds={plr.UserId}&size=48x48&format=png`
 	})
@@ -76,7 +91,8 @@ local function sendWebhook()
 			["description"] = `{os.date("%I:%M %p")}`,
 			["color"] = 16776960,
 			["image"] = {["url"] = "https://static.wikia.nocookie.net/your-bizarre-adventure/images/f/fd/LuckyArrow.png/revision/latest?cb=20221020062009"},
-			["thumbnail"] = {["url"] = body.data[1].imageUrl}        
+			["thumbnail"] = {["url"] = body.data[1].imageUrl},
+            ["footer"] = {["text"] = `{lCount}/9 lucky arrows`}  
 		}}})
 	})
 end
