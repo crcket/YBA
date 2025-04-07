@@ -289,7 +289,8 @@ plr.PlayerStats.Money.Changed:Connect(function()
 				local args = {[1] = "PurchaseShopItem",[2] = {["ItemName"] = "1x Lucky Arrow"}}; 
 				plr.Character.RemoteEvent:FireServer(unpack(args))
 				sendWebhook()
-				writefile("YBA_AUTOHOP/Count.txt",`{readfile("YBA_AUTOHOP/Count.txt")}{os.date("%I:%M %p")}\n`)
+				local nameAndTime = `{plr.Name} {os.date("%I:%M %p")}`
+				writefile("YBA_AUTOHOP/Count.txt",`{readfile("YBA_AUTOHOP/Count.txt")}{nameAndTime}\n`)
 			end
 		end
 	end
