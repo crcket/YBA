@@ -66,8 +66,6 @@ local function serverHop()
 end
 
 local function sendWebhook()
-
-
     local lCount = 1;
     for _,lucky in pairs(plr.Backpack:GetChildren()) do
         if lucky.Name == "Lucky Arrow" then
@@ -151,6 +149,14 @@ local function hookmetamethod(obj, metamethod, newFunction)
 	setreadonly(meta, true)
 
 	return hookedFunction
+end
+
+
+if not isfolder("YBA_AUTOHOP") then
+    makefolder("YBA_AUTOHOP")
+end
+if not isfile("YBA_AUTOHOP/Count.txt") then
+    writefile("YBA_AUTOHOP/Count.txt","")
 end
 
 local function setup()
@@ -283,7 +289,7 @@ plr.PlayerStats.Money.Changed:Connect(function()
 				local args = {[1] = "PurchaseShopItem",[2] = {["ItemName"] = "1x Lucky Arrow"}}; 
 				plr.Character.RemoteEvent:FireServer(unpack(args))
 				sendWebhook()
-				
+				writefile("YBA_AUTOHOP/Count.txt",`{readfile("YBA_AUTOHOP/Count.txt")}{os.date("%I:%M %p")}\n`)
 			end
 		end
 	end
