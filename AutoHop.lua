@@ -120,7 +120,9 @@ local function processInventory()
 end
 
 task.spawn(function()
-    plr.Backpack.ChildAdded:Connect(function()
+        task.wait(15)
+        plr.Backpack.ChildAdded:Connect(function()
+        
         if getgenv().Settings.SellAll then
             processInventory()
         end
