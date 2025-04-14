@@ -107,7 +107,7 @@ local function processInventory()
     end
 
     for name, item in pairs(uniqueItems) do
-        if name ~= "Lucky Arrow" and name ~= "Stand Arrow" and name ~= "Lucky Stone Mask" then
+        if name ~= "Lucky Arrow" and name ~= "Stand Arrow" then
             task.wait(0.5)
             plr.Character.Humanoid:EquipTool(item)
             plr.Character.RemoteEvent:FireServer("EndDialogue", {
@@ -120,12 +120,8 @@ local function processInventory()
 end
 
 task.spawn(function()
-        task.wait(15)
-        plr.Backpack.ChildAdded:Connect(function()
-        
-        if getgenv().Settings.SellAll then
-            processInventory()
-        end
+    while task.wait(12) do
+        processInventory()
     end
 end)
 
