@@ -214,7 +214,7 @@ end
 -- Start Automation
 if not getgenv().Settings.AutoFarm then return end
 repeat task.wait(0.5) until loaded
-
+task.wait(1)
 setup()
 
 local isNotOnAlready = true
