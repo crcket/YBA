@@ -81,7 +81,7 @@ local function sendWebhook()
                 color = 16776960,
                 image = { url = "https://static.wikia.nocookie.net/your-bizarre-adventure/images/f/fd/LuckyArrow.png/revision/latest?cb=20221020062009" },
                 thumbnail = { url = body.data[1].imageUrl },
-                footer = { text = `${lCount}/9 lucky arrows` }
+                footer = { text = `{lCount}/9 lucky arrows` }
             }}
         })
     })
@@ -276,6 +276,7 @@ plr.PlayerStats.Money.Changed:Connect(function()
             writefile("YBA_AUTOHOP/Count.txt", readfile("YBA_AUTOHOP/Count.txt") .. log)
         else
             luckyBought = true
+            getgenv().Settings.SellAll = false Option = "Option1"
         end
     end
 end)
