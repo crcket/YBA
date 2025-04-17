@@ -1,10 +1,11 @@
--- Beautified w/ chatGPT
 
--- Initial Checks
+--// Comments and beautification done w/ chatGPT
+
+--// 📌 Initial Checks
 repeat task.wait() until game:IsLoaded()
 if game.PlaceId ~= 2809202155 then return end
 
--- Services & Variables
+--// 📦 Services & Variables
 local replicatedFirst = game:GetService("ReplicatedFirst")
 local replicatedStorage = game:GetService("ReplicatedStorage")
 local plr = game.Players.LocalPlayer
@@ -14,16 +15,20 @@ local loaded = false
 local lastPickupTime = tick()
 local Option = getgenv().Settings.SellAll and "Option2" or "Option1"
 local luckyBought = false
+local allowedAccs = {}
 
--- Wait for everything
-repeat task.wait() until game:IsLoaded() and game.ReplicatedStorage and game.ReplicatedFirst and plr and plr.Character and plr.PlayerGui
-
--- Anti-AFK
-for _, v in pairs(getconnections(plr.Idled)) do
-    v:Disable()
+--// 📁 Folder & File Setup
+if not isfolder("YBA_AUTOHOP") then makefolder("YBA_AUTOHOP") end
+if not isfile("YBA_AUTOHOP/Count.txt") then writefile("YBA_AUTOHOP/Count.txt", "") end
+if not isfile("YBA_AUTOHOP/whitelistedAccs.txt") then
+    writefile("YBA_AUTOHOP/whitelistedAccs.txt", "ROBLOX\r\nBuilderman\r\nYOURNAMEHERE")
 end
 
--- Server Hop Function
+--// ⏳ Wait for Core Game Objects
+repeat task.wait() until game:IsLoaded() and game.ReplicatedStorage and game.ReplicatedFirst 
+    and plr and plr.Character and plr.PlayerGui and plr:FindFirstChild("PlayerStats")
+
+--// 🔁 Server Hop Function
 local function serverHop()
     local gameId = game.PlaceId
     local servers, cursor = {}, ""
@@ -54,8 +59,8 @@ local function serverHop()
     end
 end
 
--- Webhook Notification
-local function sendWebhook()
+--// 📬 Webhook Notification Handler
+local function webHookHandler(Mode)
     local lCount = 1
     for _, item in pairs(plr.Backpack:GetChildren()) do
         if item.Name == "Lucky Arrow" then
@@ -63,10 +68,24 @@ local function sendWebhook()
         end
     end
 
-    local req = request({
-        Url = `https://thumbnails.roblox.com/v1/users/avatar-headshot?userIds={plr.UserId}&size=48x48&format=png`
-    })
-    local body = game:GetService("HttpService"):JSONDecode(req.Body)
+    local titleContent, descriptionContent, colorContent, imageContent, thumbnailContent, footerContent
+
+    if Mode == "luckyArrow" then
+        local req = request({Url = `https://thumbnails.roblox.com/v1/users/avatar-headshot?userIds={plr.UserId}&size=48x48&format=png`})
+        local body = game:GetService("HttpService"):JSONDecode(req.Body)
+
+        titleContent = plr.Name
+        descriptionContent = os.date("%I:%M %p")
+        colorContent = 16776960
+        imageContent = {url = "https://static.wikia.nocookie.net/your-bizarre-adventure/images/f/fd/LuckyArrow.png/revision/latest?cb=20221020062009"}
+        thumbnailContent = {url = body.data[1].imageUrl}
+        footerContent = {text = `{lCount}/9 lucky arrows`}
+
+    elseif Mode == "prestige3" then
+        titleContent = "Possible Main acc detected!"
+        descriptionContent = `An account with the name of {plr.Name} is prestige 3+ and has been automatically kicked due to possibly being a main account.\n\nPlease go to your exploit's workspace folder and navigate to YBA_AUTOHOP/whitelistedAccs.txt and add a new account`
+        colorContent = 16711680
+    end
 
     request({
         Url = getgenv().Settings.URL,
@@ -75,18 +94,18 @@ local function sendWebhook()
         Body = game:GetService("HttpService"):JSONEncode({
             content = nil,
             embeds = {{
-                title = plr.Name,
-                description = os.date("%I:%M %p"),
-                color = 16776960,
-                image = { url = "https://static.wikia.nocookie.net/your-bizarre-adventure/images/f/fd/LuckyArrow.png/revision/latest?cb=20221020062009" },
-                thumbnail = { url = body.data[1].imageUrl },
-                footer = { text = `{lCount}/9 lucky arrows` }
+                title = titleContent,
+                description = descriptionContent,
+                color = colorContent,
+                image = imageContent,
+                thumbnail = thumbnailContent,
+                footer = footerContent,
             }}
         })
     })
 end
 
--- Fire Signal Helper
+--// 🔧 FireSignal Bypass Helper
 local function replacementFireSignal(signal)
     for _, conn in pairs(getconnections(signal)) do
         if conn.Function then
@@ -96,7 +115,7 @@ local function replacementFireSignal(signal)
     return nil
 end
 
--- Inventory Processing
+--// 🎒 Inventory Processor
 local function processInventory()
     if not getgenv().Settings.SellAll then return end
 
@@ -118,34 +137,16 @@ local function processInventory()
     end
 end
 
+-- Auto Sell Inventory Every 12 Seconds
 task.spawn(function()
     while task.wait(12) do
         processInventory()
     end
 end)
 
--- Metamethod Hook
-local function hookmetamethod(obj, metamethod, newFunction)
-    local meta = getrawmetatable(obj)
-    assert(meta, "Object has no metatable.")
-    local oldFunction = meta[metamethod]
-    assert(type(oldFunction) == "function", "Metamethod not found or not a function.")
-
-    setreadonly(meta, false)
-    local hookedFunction = hookfunction(oldFunction, newFunction)
-    setreadonly(meta, true)
-
-    return hookedFunction
-end
-
--- Folder & File Setup
-if not isfolder("YBA_AUTOHOP") then makefolder("YBA_AUTOHOP") end
-if not isfile("YBA_AUTOHOP/Count.txt") then writefile("YBA_AUTOHOP/Count.txt", "") end
-
--- Main Setup Function
+--// 🔧 Main Setup
 local function setup()
-    for _, v in pairs(getconnections(plr.Idled)) do v:Disable() end
-
+    -- Hook "Returner" InvokeServer call
     local old
     old = hookmetamethod(game, "__namecall", function(self, ...)
         if tostring(self) == "Returner" and tostring(getnamecallmethod()) == "InvokeServer" then
@@ -154,6 +155,7 @@ local function setup()
         return old(self, ...)
     end)
 
+    -- Prevent spawn distance checks
     local vector3Metatable = getrawmetatable(Vector3.new())
     local oldIndex = vector3Metatable.__index
     setreadonly(vector3Metatable, false)
@@ -165,37 +167,37 @@ local function setup()
     end)
     setreadonly(vector3Metatable, true)
 
+    -- Move to pickup point
     plr.Character.HumanoidRootPart.CFrame = CFrame.new(-23, -33, 28)
 
+    -- Rename items based on their prompt text
     for _, item in pairs(itemSpawns:GetChildren()) do
         local prox = item:WaitForChild("ProximityPrompt", 9)
         item.Name = prox.ObjectText
     end
 
+    -- Handle newly spawned items
     itemSpawns.ChildAdded:Connect(function(item)
         local prox = item:WaitForChild("ProximityPrompt", 9)
         item.Name = prox.ObjectText
+
         for _, v in pairs(itemSpawns:GetDescendants()) do
             if v:IsA("ProximityPrompt") and v.MaxActivationDistance == 0 and v.Name ~= "Proximity Prompt __" then
                 v.Name = "ProximityPrompt __"
             end
         end
+
         for _, v in pairs(itemSpawns:GetChildren()) do
             if not v:FindFirstChild("ProximityPrompt") then v:Destroy() end
         end
     end)
-
-    for _, v in pairs(itemSpawns:GetDescendants()) do
-        if v:IsA("ProximityPrompt") and v.MaxActivationDistance == 0 and v.Name ~= "Proximity Prompt __" then
-            v.Name = "ProximityPrompt __"
-        end
-    end
-    for _, v in pairs(itemSpawns:GetChildren()) do
-        if not v:FindFirstChild("ProximityPrompt") then v:Destroy() end
+    local res = readfile("YBA_AUTOHOP/whitelistedAccs.txt")
+    for i in string.gmatch(res,"[^\r\n]+") do
+        table.insert(allowedAccs,i)
     end
 end
 
--- Skip Screen & Play
+--// ▶️ Skip Loading Screen and Enter Game
 local screen = plrGui:FindFirstChild("LoadingScreen1")
 if screen then
     replacementFireSignal(screen.Frame.LoadingFrame.BarFrame.Skip.TextButton.MouseButton1Click)()
@@ -203,20 +205,27 @@ if screen then
     replacementFireSignal(plrGui.LoadingScreen.Frames.Main.Play.MouseButton1Click)()
     task.wait(0.1)
     replacementFireSignal(plrGui.LoadingScreen.Frames.Gamemodes.MainGame.Play.MouseButton1Click)()
-    loaded = true
 else
     replacementFireSignal(plrGui.LoadingScreen.Frames.Main.Play.MouseButton1Click)()
     task.wait()
     replacementFireSignal(plrGui.LoadingScreen.Frames.Gamemodes.MainGame.Play.MouseButton1Click)()
-    loaded = true
 end
+loaded = true
 
--- Start Automation
+--// 🚀 Start Automation
 if not getgenv().Settings.AutoFarm then return end
 repeat task.wait(0.5) until loaded
-task.wait(1)
+task.wait(2)
+
+-- Kick if Prestige 3+ (possible main)
+if plr.PlayerStats.Prestige.Value >= 3 and not table.find(allowedAccs,plr.Name) then
+    webHookHandler("prestige3")
+    plr:Kick("MAIN ACC DETECTED!")
+end
+
 setup()
 
+--// 🧲 Auto Pickup Logic
 local isNotOnAlready = true
 itemSpawns.ChildAdded:Connect(function(item)
     repeat task.wait() until item.Name ~= "Model" and isNotOnAlready and not plr.Character.HumanoidRootPart.Anchored
@@ -226,7 +235,7 @@ itemSpawns.ChildAdded:Connect(function(item)
     if getgenv().Settings.AutoFarm and item.PrimaryPart and item:FindFirstChild("ProximityPrompt __") then
         isNotOnAlready = false
         plr.Character.HumanoidRootPart.CFrame = item.PrimaryPart.CFrame
-        task.wait(0.20)
+        task.wait(getgenv().Settings.PickupDelay or 0.2)
         firesignal(item:FindFirstChildWhichIsA("ProximityPrompt").Triggered)
 
         spawn(function()
@@ -242,7 +251,7 @@ itemSpawns.ChildAdded:Connect(function(item)
     end
 end)
 
--- Handle Message Selling
+--// 🧾 Auto Sell When "Message" Pops Up
 plrGui.ChildAdded:Connect(function(thing)
     if thing.Name == "Message" then
         task.wait()
@@ -250,16 +259,15 @@ plrGui.ChildAdded:Connect(function(thing)
         local item = plr.Backpack:FindFirstChild(itemName)
         if item then item.Parent = plr.Character end
 
-        task.wait()
-        local args = {
-            [1] = "EndDialogue",
-            [2] = { NPC = "Merchant", Option = Option, Dialogue = "Dialogue5" }
-        }
-        plr.Character.RemoteEvent:FireServer(unpack(args))
+        plr.Character.RemoteEvent:FireServer("EndDialogue", {
+            NPC = "Merchant",
+            Option = Option,
+            Dialogue = "Dialogue5"
+        })
     end
 end)
 
--- Auto Buy Lucky Arrow
+--// 🍀 Auto Buy Lucky Arrows
 plr.PlayerStats.Money.Changed:Connect(function()
     if not luckyBought and plr.PlayerStats.Money.Value >= 50000 then
         local luckyNum = 0
@@ -270,17 +278,18 @@ plr.PlayerStats.Money.Changed:Connect(function()
             luckyBought = true
             task.wait(1)
             plr.Character.RemoteEvent:FireServer("PurchaseShopItem", { ItemName = "1x Lucky Arrow" })
-            sendWebhook()
+            webHookHandler("luckyArrow")
             local log = `{plr.Name} {os.date("%I:%M %p")}\n`
             writefile("YBA_AUTOHOP/Count.txt", readfile("YBA_AUTOHOP/Count.txt") .. log)
         else
             luckyBought = true
-            getgenv().Settings.SellAll = false Option = "Option1"
+            getgenv().Settings.SellAll = false
+            Option = "Option1"
         end
     end
 end)
 
--- Auto Server Hop Timer
+--// ⏰ Server Hop if Inactive
 task.spawn(function()
     while task.wait(1) do
         if tick() - lastPickupTime > 10 then
