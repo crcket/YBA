@@ -12,7 +12,6 @@ local plr = game.Players.LocalPlayer
 local itemSpawns = workspace["Item_Spawns"].Items
 local plrGui = plr.PlayerGui
 local loaded = false
-local lastPickupTime = tick()
 local Option = getgenv().Settings.SellAll and "Option2" or "Option1"
 local luckyBought = false
 local allowedAccs = {}
@@ -215,8 +214,8 @@ loaded = true
 --// 🚀 Start Automation
 if not getgenv().Settings.AutoFarm then return end
 repeat task.wait(0.5) until loaded
-task.wait(2)
-
+task.wait(5)
+local lastPickupTime = tick()
 -- Kick if Prestige 3+ (possible main)
 if plr.PlayerStats.Prestige.Value >= 3 and not table.find(allowedAccs,plr.Name) then
     webHookHandler("prestige3")
