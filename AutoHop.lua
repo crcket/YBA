@@ -10,6 +10,7 @@ local replicatedStorage = game:GetService("ReplicatedStorage")
 local plr = game.Players.LocalPlayer
 local itemSpawns = workspace["Item_Spawns"].Items
 local plrGui = plr.PlayerGui
+local coregui = game.CoreGui
 local loaded = false
 local Option = getgenv().Settings.SellAll and "Option2" or "Option1"
 local luckyBought = false
@@ -193,6 +194,13 @@ local function setup()
         table.insert(allowedAccs,i)
     end
 end
+local function checkForKickMessage()
+    local message = coregui:FindFirstChild("RobloxPromptGui")
+    if message and message:FindFirstChild("ErrorPrompt", true) then
+        return true
+    end
+    return false
+end
 --// ▶️ Skip Loading Screen and Enter Game
 if not plr.Character:FindFirstChild("RemoteEvent") then
     task.wait(1)    
@@ -282,7 +290,7 @@ end)
 --// ⏰ Server Hop if Inactive
 task.spawn(function()
     while task.wait(0.5) do
-        if tick() - lastPickupTime > 10*2 then -- 10*2 to account for 0.5
+        if tick() - lastPickupTime > 10*2 or checkForKickMessage() then -- 10*2 to account for 0.5
             serverHop() -- maybe lastditch l8r
         end
     end
