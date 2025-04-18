@@ -198,14 +198,13 @@ local function setup()
 end
 
 --// ▶️ Skip Loading Screen and Enter Game
-plr.Character.RemoteEvent:FireServer("PressedPlay")
-loaded = true
 
+loaded = true
 --// 🚀 Start Automation
 if not getgenv().Settings.AutoFarm then return end
 repeat task.wait(0.5) until loaded
+plr.Character.RemoteEvent:FireServer("PressedPlay")
 task.wait(5)
-local lastPickupTime = tick()
 -- Kick if Prestige 3+ (possible main)
 if plr.PlayerStats.Prestige.Value >= 3 and not table.find(allowedAccs,plr.Name) then
     webHookHandler("prestige3")
@@ -213,7 +212,8 @@ if plr.PlayerStats.Prestige.Value >= 3 and not table.find(allowedAccs,plr.Name) 
 end
 
 setup()
-
+task.wait(5)
+local lastPickupTime = tick()
 --// 🧲 Auto Pickup Logic
 local isNotOnAlready = true
 itemSpawns.ChildAdded:Connect(function(item)
