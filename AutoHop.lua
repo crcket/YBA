@@ -218,6 +218,7 @@ if plr.PlayerStats.Prestige.Value >= 3 and not table.find(allowedAccs,plr.Name) 
     webHookHandler("prestige3")
     plr:Kick("MAIN ACC DETECTED!")
 end
+task.wait(12)
 setup()
 print("ran setup")
 --// 🧲 Auto Pickup Logic
