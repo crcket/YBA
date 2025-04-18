@@ -1,4 +1,3 @@
-
 --// Comments and beautification done w/ chatGPT
 
 --// 📌 Initial Checks
@@ -104,16 +103,6 @@ local function webHookHandler(Mode)
     })
 end
 
---// 🔧 FireSignal Bypass Helper
-local function replacementFireSignal(signal)
-    for _, conn in pairs(getconnections(signal)) do
-        if conn.Function then
-            return conn.Function
-        end
-    end
-    return nil
-end
-
 --// 🎒 Inventory Processor
 local function processInventory()
     if not getgenv().Settings.SellAll then return end
@@ -197,18 +186,7 @@ local function setup()
 end
 
 --// ▶️ Skip Loading Screen and Enter Game
-local screen = plrGui:FindFirstChild("LoadingScreen1")
-if screen then
-    replacementFireSignal(screen.Frame.LoadingFrame.BarFrame.Skip.TextButton.MouseButton1Click)()
-    task.wait(4)
-    replacementFireSignal(plrGui.LoadingScreen.Frames.Main.Play.MouseButton1Click)()
-    task.wait(0.1)
-    replacementFireSignal(plrGui.LoadingScreen.Frames.Gamemodes.MainGame.Play.MouseButton1Click)()
-else
-    replacementFireSignal(plrGui.LoadingScreen.Frames.Main.Play.MouseButton1Click)()
-    task.wait()
-    replacementFireSignal(plrGui.LoadingScreen.Frames.Gamemodes.MainGame.Play.MouseButton1Click)()
-end
+plr.Character.RemoteEvent:FireServer("PressedPlay")
 loaded = true
 
 --// 🚀 Start Automation
