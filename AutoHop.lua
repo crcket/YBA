@@ -281,7 +281,7 @@ end)
 --// ⏰ Server Hop if Inactive
 task.spawn(function()
     while task.wait(1) do
-        if tick() - lastPickupTime > 10 then
+        if tick() - lastPickupTime > 5 then
             serverHop()
         end
     end
