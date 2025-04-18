@@ -32,8 +32,7 @@ if not isfile("YBA_AUTOHOP/theme.mp3") then
     end
 end
 task.spawn(function()
-    repeat task.wait() until workspace:FindFirstChild("LoadingScreen"):FindFirstChild("Song")
-    workspace:FindFirstChild("LoadingScreen"):FindFirstChild("Song").SoundId = getcustomasset("YBA_AUTOHOP/theme.mp3")
+    workspace:WaitForChild("LoadingScreen",90):WaitForChild("Song",90).SoundId = getcustomasset("YBA_AUTOHOP/theme.mp3")
 end)
 --// ⏳ Wait for Core Game Objects
 repeat task.wait() until game:IsLoaded() and game.ReplicatedStorage and game.ReplicatedFirst 
