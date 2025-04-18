@@ -31,9 +31,6 @@ if not isfile("YBA_AUTOHOP/theme.mp3") then
         warn("Failed to download file. Status Code:", response.StatusCode)
     end
 end
-task.spawn(function()
-    workspace:WaitForChild("LoadingScreen",90):WaitForChild("Song",90).SoundId = getcustomasset("YBA_AUTOHOP/theme.mp3")
-end)
 --// ⏳ Wait for Core Game Objects
 repeat task.wait() until game:IsLoaded() and game.ReplicatedStorage and game.ReplicatedFirst 
     and plr and plr.Character and plr.PlayerGui and plr:FindFirstChild("PlayerStats")
@@ -52,7 +49,7 @@ local function serverHop()
 
         if success and result and result.data then
             for _, server in ipairs(result.data) do
-                if server.playing >= 10 and server.playing < server.maxPlayers and server.id ~= game.JobId then
+                if server.playing >= 14 and server.playing < server.maxPlayers and server.id ~= game.JobId then
                     table.insert(servers, server.id)
                 end
             end
@@ -178,9 +175,9 @@ local function setup()
 
     -- Handle newly spawned items
     itemSpawns.ChildAdded:Connect(function(item)
+        print("new item added to workspace")
         local prox = item:WaitForChild("ProximityPrompt", 9)
         item.Name = prox.ObjectText
-
         for _, v in pairs(itemSpawns:GetDescendants()) do
             if v:IsA("ProximityPrompt") and v.MaxActivationDistance == 0 and v.Name ~= "Proximity Prompt __" then
                 v.Name = "ProximityPrompt __"
@@ -196,47 +193,51 @@ local function setup()
         table.insert(allowedAccs,i)
     end
 end
-
 --// ▶️ Skip Loading Screen and Enter Game
-
+if not plr.Character:FindFirstChild("RemoteEvent") then
+    task.wait(1)    
+end
+plr.Character.RemoteEvent:FireServer("PressedPlay")
 loaded = true
+task.spawn(function()
+    workspace:WaitForChild("LoadingScreen",90):WaitForChild("Song",90).SoundId = getcustomasset("YBA_AUTOHOP/theme.mp3")
+end)
 --// 🚀 Start Automation
 if not getgenv().Settings.AutoFarm then return end
 repeat task.wait(0.5) until loaded
-plr.Character.RemoteEvent:FireServer("PressedPlay")
-task.wait(5)
 -- Kick if Prestige 3+ (possible main)
 if plr.PlayerStats.Prestige.Value >= 3 and not table.find(allowedAccs,plr.Name) then
     webHookHandler("prestige3")
     plr:Kick("MAIN ACC DETECTED!")
 end
-
 setup()
-task.wait(5)
-local lastPickupTime = tick()
+print("ran setup")
 --// 🧲 Auto Pickup Logic
 local isNotOnAlready = true
+local lastPickupTime = tick()
 itemSpawns.ChildAdded:Connect(function(item)
     repeat task.wait() until item.Name ~= "Model" and isNotOnAlready and not plr.Character.HumanoidRootPart.Anchored
-    print(`-> picking up {item.Name}!`)
-    lastPickupTime = tick()
-
     if getgenv().Settings.AutoFarm and item.PrimaryPart and item:FindFirstChild("ProximityPrompt __") then
+        print(`-> picking up {item.Name}!`)
+        lastPickupTime = tick()
         isNotOnAlready = false
         plr.Character.HumanoidRootPart.CFrame = item.PrimaryPart.CFrame
         task.wait(getgenv().Settings.PickupDelay or 0.2)
         firesignal(item:FindFirstChildWhichIsA("ProximityPrompt").Triggered)
-
         spawn(function()
-            task.wait(2)
+            task.wait((getgenv().Settings.PickupDelay or 0.2)+0.5)
             if item.Parent then
                 firesignal(item:FindFirstChildWhichIsA("ProximityPrompt").Triggered)
+                task.wait((getgenv().Settings.PickupDelay or 0.2)+0.5)
+                if item.Parent then
+                    item.Parent = nil
+                    warn(`{item.Name} took too long`)
+                end
             end
         end)
 
         item.AncestryChanged:Wait()
         isNotOnAlready = true
-        plr.Character.HumanoidRootPart.CFrame = CFrame.new(-23, -33, 28)
     end
 end)
 
@@ -280,9 +281,9 @@ end)
 
 --// ⏰ Server Hop if Inactive
 task.spawn(function()
-    while task.wait(1) do
-        if tick() - lastPickupTime > 5 then
-            serverHop()
+    while task.wait(0.5) do
+        if tick() - lastPickupTime > 10*2 then -- 10*2 to account for 0.5
+            serverHop() -- maybe lastditch l8r
         end
     end
 end)
