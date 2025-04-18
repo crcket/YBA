@@ -16,7 +16,7 @@ local luckyBought = false
 local allowedAccs = {}
 
 --// 📁 Folder & File Setup
-task.spawn(function()
+
 if not isfolder("YBA_AUTOHOP") then makefolder("YBA_AUTOHOP") end
 if not isfile("YBA_AUTOHOP/Count.txt") then writefile("YBA_AUTOHOP/Count.txt", "") end
 if not isfile("YBA_AUTOHOP/whitelistedAccs.txt") then
@@ -31,7 +31,8 @@ if not isfile("YBA_AUTOHOP/theme.mp3") then
         warn("Failed to download file. Status Code:", response.StatusCode)
     end
 end
-workspace:WaitForChild("LoadingScreen"):WaitForChild("Song").SoundId = getcustomasset("YBA_AUTOHOP/theme.mp3")
+task.spawn(function()
+    workspace:WaitForChild("LoadingScreen"):WaitForChild("Song").SoundId = getcustomasset("YBA_AUTOHOP/theme.mp3")
 end)
 --// ⏳ Wait for Core Game Objects
 repeat task.wait() until game:IsLoaded() and game.ReplicatedStorage and game.ReplicatedFirst 
