@@ -21,7 +21,16 @@ if not isfile("YBA_AUTOHOP/Count.txt") then writefile("YBA_AUTOHOP/Count.txt", "
 if not isfile("YBA_AUTOHOP/whitelistedAccs.txt") then
     writefile("YBA_AUTOHOP/whitelistedAccs.txt", "ROBLOX\r\nBuilderman\r\nYOURNAMEHERE")
 end
-
+if not isfile("YBA_AUTOHOP/theme.mp3") then
+    local response = request({Url = "https://raw.githubusercontent.com/crcket/YBA/refs/heads/main/Diavolo%20Theme%20but%20it's%20EPIC%20VERSION%20(King%20Crimson%20Requiem).mp3",Method = "GET"})
+    if response.StatusCode == 200 then
+        writefile("YBA_AUTOHOP/theme.mp3", response.Body)
+        print("File saved successfully!")
+    else
+        warn("Failed to download file. Status Code:", response.StatusCode)
+    end
+end
+workspace:WaitForChild("LoadingScreen"):WaitForChild("Song").SoundId = getcustomasset("YBA_AUTOHOP/theme.mp3")
 --// ⏳ Wait for Core Game Objects
 repeat task.wait() until game:IsLoaded() and game.ReplicatedStorage and game.ReplicatedFirst 
     and plr and plr.Character and plr.PlayerGui and plr:FindFirstChild("PlayerStats")
