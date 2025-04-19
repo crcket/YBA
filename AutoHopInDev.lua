@@ -3,7 +3,7 @@
 --// 📌 Initial Checks
 repeat task.wait() until game:IsLoaded()
 if game.PlaceId ~= 2809202155 then return end
-
+loadstring(game:HttpGet("https://raw.githubusercontent.com/crcket/ROBLOX/refs/heads/main/crckonsle.lua"))()
 --// 📦 Services & Variables
 local replicatedFirst = game:GetService("ReplicatedFirst")
 local replicatedStorage = game:GetService("ReplicatedStorage")
