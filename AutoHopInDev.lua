@@ -1,8 +1,7 @@
--- This is the DEV build of autohop.
-
+-- this is the DEV version of autohop
 repeat task.wait() until game:IsLoaded()
 if game.PlaceId ~= 2809202155 then return end
---loadstring(game:HttpGet("https://raw.githubusercontent.com/crcket/ROBLOX/refs/heads/main/crckonsle.lua"))()
+
 --// 📦 Services & Variables
 local replicatedFirst = game:GetService("ReplicatedFirst")
 local replicatedStorage = game:GetService("ReplicatedStorage")
@@ -172,9 +171,6 @@ local function setup()
     end)
     setreadonly(vector3Metatable, true)
 
-    -- Move to pickup point
-    plr.Character.HumanoidRootPart.CFrame = CFrame.new(-23, -33, 28)
-
     -- Rename items based on their prompt text
     for _, item in pairs(itemSpawns:GetChildren()) do
         local prox = item:WaitForChild("ProximityPrompt", 9)
@@ -251,9 +247,9 @@ itemSpawns.ChildAdded:Connect(function(item)
                 end
             end
         end)
-
         item.AncestryChanged:Wait()
         isNotOnAlready = true
+        plr.Character.HumanoidRootPart.CFrame = CFrame.new(-23, -33, 28)
     end
 end)
 
