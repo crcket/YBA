@@ -1,6 +1,4 @@
---// Comments and beautification done w/ chatGPT
-
---// 📌 Initial Checks
+-- this is the RELEASE version of autohop
 repeat task.wait() until game:IsLoaded()
 if game.PlaceId ~= 2809202155 then return end
 
@@ -22,6 +20,9 @@ if not isfolder("YBA_AUTOHOP") then makefolder("YBA_AUTOHOP") end
 if not isfile("YBA_AUTOHOP/Count.txt") then writefile("YBA_AUTOHOP/Count.txt", "") end
 if not isfile("YBA_AUTOHOP/whitelistedAccs.txt") then
     writefile("YBA_AUTOHOP/whitelistedAccs.txt", "ROBLOX\r\nBuilderman\r\nYOURNAMEHERE")
+end
+if not isfile("YBA_AUTOHOP/lastLucky.txt") then
+    writefile("YBA_AUTOHOP/lastLucky.txt","")
 end
 if not isfile("YBA_AUTOHOP/theme.mp3") then
     local response = request({Url = "https://raw.githubusercontent.com/crcket/YBA/refs/heads/main/Diavolo%20Theme%20but%20it's%20EPIC%20VERSION%20(King%20Crimson%20Requiem).mp3",Method = "GET"})
@@ -76,9 +77,10 @@ local function webHookHandler(Mode)
         end
     end
 
-    local titleContent, descriptionContent, colorContent, imageContent, thumbnailContent, footerContent
+    local textContent, titleContent, descriptionContent, colorContent, imageContent, thumbnailContent, footerContent
 
     if Mode == "luckyArrow" then
+        
         local req = request({Url = `https://thumbnails.roblox.com/v1/users/avatar-headshot?userIds={plr.UserId}&size=48x48&format=png`})
         local body = game:GetService("HttpService"):JSONDecode(req.Body)
 
@@ -87,8 +89,12 @@ local function webHookHandler(Mode)
         colorContent = 16776960
         imageContent = {url = "https://static.wikia.nocookie.net/your-bizarre-adventure/images/f/fd/LuckyArrow.png/revision/latest?cb=20221020062009"}
         thumbnailContent = {url = body.data[1].imageUrl}
+        
+        if getgenv().Settings.PingOnLuckyArrow and lCount >=9 and readfile("YBA_AUTOHOP/lastLucky.txt") ~= plr.Name then
+            writefile("YBA_AUTOHOP/lastLucky.txt",plr.Name)
+            textContent = `<@{getgenv().Settings.DiscordID}>, your account, {plr.Name} has ~9/9 lucky arrows`
+        end
         footerContent = {text = `{lCount}/9 lucky arrows`}
-
     elseif Mode == "prestige3" then
         titleContent = "Possible Main acc detected!"
         descriptionContent = `An account with the name of {plr.Name} is prestige 3+ and has been automatically kicked due to possibly being a main account.\n\nPlease go to your exploit's workspace folder and navigate to YBA_AUTOHOP/whitelistedAccs.txt and add a new account`
@@ -100,7 +106,7 @@ local function webHookHandler(Mode)
         Method = "POST",
         Headers = { ["Content-Type"] = "application/json" },
         Body = game:GetService("HttpService"):JSONEncode({
-            content = nil,
+            content = textContent,
             embeds = {{
                 title = titleContent,
                 description = descriptionContent,
@@ -164,9 +170,6 @@ local function setup()
         return oldIndex(self, idx)
     end)
     setreadonly(vector3Metatable, true)
-
-    -- Move to pickup point
-    plr.Character.HumanoidRootPart.CFrame = CFrame.new(-23, -33, 28)
 
     -- Rename items based on their prompt text
     for _, item in pairs(itemSpawns:GetChildren()) do
@@ -244,9 +247,9 @@ itemSpawns.ChildAdded:Connect(function(item)
                 end
             end
         end)
-
         item.AncestryChanged:Wait()
         isNotOnAlready = true
+        plr.Character.HumanoidRootPart.CFrame = CFrame.new(-23, -33, 28)
     end
 end)
 
@@ -282,6 +285,14 @@ plr.PlayerStats.Money.Changed:Connect(function()
             writefile("YBA_AUTOHOP/Count.txt", readfile("YBA_AUTOHOP/Count.txt") .. log)
         else
             luckyBought = true
+            if getgenv().Settings.PingOnLuckyArrow then
+                warn(readfile("YBA_AUTOHOP/lastLucky.txt"))
+                if readfile("YBA_AUTOHOP/lastLucky.txt") == plr.Name then
+                    else
+                    webHookHandler("luckyArrow")
+                end
+                warn("didthislucksend")
+            end
             getgenv().Settings.SellAll = false
             Option = "Option1"
         end
