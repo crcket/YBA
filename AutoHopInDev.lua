@@ -216,6 +216,7 @@ end)
 --// 🚀 Start Automation
 if not getgenv().Settings.AutoFarm then return end
 repeat task.wait(0.5) until loaded
+local console = loadstring(game:HttpGet("https://raw.githubusercontent.com/crcket/ROBLOX/refs/heads/main/crckonsle.lua"))()
 -- Kick if Prestige 3+ (possible main)
 if plr.PlayerStats.Prestige.Value >= 3 and not table.find(allowedAccs,plr.Name) then
     webHookHandler("prestige3")
@@ -224,6 +225,9 @@ end
 task.wait(12)
 setup()
 print("ran setup")
+task.spawn(function()
+    console.Send(`ran setup @ {game.JobId}!`,"ANNOUNCEMENT")
+end)
 --// 🧲 Auto Pickup Logic
 local isNotOnAlready = true
 local lastPickupTime = tick()
@@ -231,6 +235,7 @@ itemSpawns.ChildAdded:Connect(function(item)
     repeat task.wait() until item.Name ~= "Model" and isNotOnAlready and not plr.Character.HumanoidRootPart.Anchored
     if getgenv().Settings.AutoFarm and item.PrimaryPart and item:FindFirstChild("ProximityPrompt __") then
         print(`-> picking up {item.Name}!`)
+        task.spawn(function() console.Send(`picking up {item.Name}!`,"ITEM_PICKUP") end)
         lastPickupTime = tick()
         isNotOnAlready = false
         plr.Character.HumanoidRootPart.CFrame = item.PrimaryPart.CFrame
@@ -243,7 +248,9 @@ itemSpawns.ChildAdded:Connect(function(item)
                 task.wait((getgenv().Settings.PickupDelay or 0.2)+0.5)
                 if item.Parent then
                     item.Parent = nil
-                    warn(`{item.Name} took too long`)
+                    task.spawn(function()
+                        console.Send(`{item.Name} took too long to pick up.. deleting`,"ITEM_TIMEOUT")
+                    end)
                 end
             end
         end)
