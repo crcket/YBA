@@ -91,6 +91,7 @@ local function webHookHandler(Mode)
         thumbnailContent = {url = body.data[1].imageUrl}
         
         if getgenv().Settings.PingOnLuckyArrow and lCount >=9 and readfile("YBA_AUTOHOP/lastLucky.txt") ~= plr.Name then
+            lCount = lCount - 1
             writefile("YBA_AUTOHOP/lastLucky.txt",plr.Name)
             textContent = `<@{getgenv().Settings.DiscordID}>, your account, {plr.Name} has ~9/9 lucky arrows`
         end
