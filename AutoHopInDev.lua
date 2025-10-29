@@ -61,6 +61,10 @@ until game:IsLoaded()
     and plr.PlayerGui
     and plr:FindFirstChild('PlayerStats')
 
+if getgenv().Settings.LowGFX then
+    game:GetService("RunService"):Set3dRenderingEnabled(false)
+end
+
 --// 🔁 Server Hop Function
 local function serverHop()
     local gameId = game.PlaceId
@@ -105,6 +109,7 @@ local function serverHop()
         warn('No available servers found.')
     end
 end
+
 if readfile('YBA_AUTOHOP/lastJobId.txt') == tostring(game.JobId) then
     printconsole("same server as last time.. hopping")
     serverHop()
@@ -419,3 +424,4 @@ task.spawn(function()
         end
     end
 end)
+
