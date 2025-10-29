@@ -211,7 +211,7 @@ end
 plr.Character.RemoteEvent:FireServer("PressedPlay")
 loaded = true
 task.spawn(function()
-    workspace:WaitForChild("LoadingScreen",90):WaitForChild("Song",90).SoundId = getcustomasset("YBA_AUTOHOP/theme.mp3")
+    --workspace:WaitForChild("LoadingScreen",90):WaitForChild("Song",90).SoundId = getcustomasset("YBA_AUTOHOP/theme.mp3")
 end)
 --// 🚀 Start Automation
 if not getgenv().Settings.AutoFarm then return end
@@ -313,4 +313,5 @@ task.spawn(function()
             serverHop() -- maybe lastditch l8r
         end
     end
+
 end)
