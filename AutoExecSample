@@ -1,0 +1,12 @@
+getgenv().Settings = {
+    AutoFarm = true; -- turning this to false deactivates the script lol
+    SellAll = true; -- if true, sells all items every 12 seconds. if not, only sells if reach max items
+    PickupDelay = 0.165; -- recommended lowest as 0.165 and highest as 0.25
+    PingOnLuckyArrow = true; -- pings your acc when you reach 9 lucky arrows
+    LowGFX = true;
+    DiscordID = YOURDISCORDIDHERE; -- self explanatory
+    URL = "DISCORDWEBHOOKHERE"
+}
+-- dev URL: https://raw.githubusercontent.com/crcket/YBA/refs/heads/main/AutoHopInDev.lua
+-- normal URL: https://raw.githubusercontent.com/crcket/YBA/refs/heads/main/AutoHop.lua
+loadstring(request({Url = "https://raw.githubusercontent.com/crcket/YBA/refs/heads/main/AutoHop.lua"}).Body)()
