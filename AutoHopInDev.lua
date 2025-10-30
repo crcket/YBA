@@ -7,47 +7,47 @@ if game.PlaceId ~= 2809202155 then
 end
 
 --// 📦 Services & Variables
-local replicatedFirst = game:GetService("ReplicatedFirst")
-local replicatedStorage = game:GetService("ReplicatedStorage")
+local replicatedFirst = game:GetService('ReplicatedFirst')
+local replicatedStorage = game:GetService('ReplicatedStorage')
 local plr = game.Players.LocalPlayer
-local itemSpawns = workspace["Item_Spawns"].Items
+local itemSpawns = workspace['Item_Spawns'].Items
 local plrGui = plr.PlayerGui
 local coregui = game.CoreGui
 local loaded = false
-local Option = getgenv().Settings.SellAll and "Option2" or "Option1"
+local Option = getgenv().Settings.SellAll and 'Option2' or 'Option1'
 local luckyBought = false
 local allowedAccs = {}
 
 --// 📁 Folder & File Setup
 
-if not isfolder("YBA_AUTOHOP") then
-    makefolder("YBA_AUTOHOP")
+if not isfolder('YBA_AUTOHOP') then
+    makefolder('YBA_AUTOHOP')
 end
-if not isfile("YBA_AUTOHOP/Count.txt") then
-    writefile("YBA_AUTOHOP/Count.txt", "")
+if not isfile('YBA_AUTOHOP/Count.txt') then
+    writefile('YBA_AUTOHOP/Count.txt', '')
 end
-if not isfile("YBA_AUTOHOP/whitelistedAccs.txt") then
+if not isfile('YBA_AUTOHOP/whitelistedAccs.txt') then
     writefile(
-        "YBA_AUTOHOP/whitelistedAccs.txt",
-        "ROBLOX\r\nBuilderman\r\nYOURNAMEHERE"
+        'YBA_AUTOHOP/whitelistedAccs.txt',
+        'ROBLOX\r\nBuilderman\r\nYOURNAMEHERE'
     )
 end
-if not isfile("YBA_AUTOHOP/lastLucky.txt") then
-    writefile("YBA_AUTOHOP/lastLucky.txt", "")
+if not isfile('YBA_AUTOHOP/lastLucky.txt') then
+    writefile('YBA_AUTOHOP/lastLucky.txt', '')
 end
-if not isfile("YBA_AUTOHOP/lastJobId.txt") then
-    writefile("YBA_AUTOHOP/lastJobId.txt", tostring(game.JobId))
+if not isfile('YBA_AUTOHOP/lastJobId.txt') then
+    writefile('YBA_AUTOHOP/lastJobId.txt', tostring(game.JobId))
 end
-if not isfile("YBA_AUTOHOP/theme.mp3") then
+if not isfile('YBA_AUTOHOP/theme.mp3') then
     local response = request({
         Url = "https://raw.githubusercontent.com/crcket/YBA/refs/heads/main/Diavolo%20Theme%20but%20it's%20EPIC%20VERSION%20(King%20Crimson%20Requiem).mp3",
-        Method = "GET",
+        Method = 'GET',
     })
     if response.StatusCode == 200 then
-        writefile("YBA_AUTOHOP/theme.mp3", response.Body)
-        print("File saved successfully!")
+        writefile('YBA_AUTOHOP/theme.mp3', response.Body)
+        print('File saved successfully!')
     else
-        warn("Failed to download file. Status Code:", response.StatusCode)
+        warn('Failed to download file. Status Code:', response.StatusCode)
     end
 end
 --// ⏳ Wait for Core Game Objects
@@ -59,111 +59,31 @@ until game:IsLoaded()
     and plr
     and plr.Character
     and plr.PlayerGui
-    and plr:FindFirstChild("PlayerStats")
+    and plr:FindFirstChild('PlayerStats')
 
 
-local function extractGitHubInfo(url)
-    local user, repo, ref =
-        url:match('githubusercontent%.com/([^/]+)/([^/]+)/(.+)')
-
-    if not user or not repo or not ref then
-        return nil, 'Invalid GitHub URL format'
-    end
-    local branch = ref:match('refs/heads/([^/]+)')
-    local remainingPath = ref:match('refs/heads/[^/]+/(.+)')
-
-    if not branch then
-        branch = ref:match('^([a-f0-9]+)')
-        remainingPath = ref:match('^[a-f0-9]+/(.+)')
-    end
-
-    return {
-        user = user,
-        repo = repo,
-        branch = branch or 'main',
-        path = remainingPath or ref,
-        fullRef = ref,
-    }
-end
-
-local function getCommitHash(user, repo, branch)
-    local apiUrl = string.format(
-        'https://api.github.com/repos/%s/%s/commits/%s',
-        user,
-        repo,
-        branch
-    )
-
-    local response = request({
-        Url = apiUrl,
-        Method = 'GET',
-        Headers = {
-            ['User-Agent'] = 'GTC',
-        },
-    })
-
-    if not response.Success then
-        return nil,
-            'Failed to fetch commit info: ' .. tostring(response.StatusCode)
-    end
-
-    local data = game:GetService('HttpService'):JSONDecode(response.Body)
-
-    if data.sha then
-        return {
-            sha = data.sha,
-            shortSha = data.sha:sub(1, 7),
-            message = data.commit.message,
-            author = data.commit.author.name,
-            date = data.commit.author.date,
-            url = data.html_url,
-        }
-    end
-
-    return nil, 'Could not parse commit data'
-end
-
--- Main function
-local function checkCommit(githubUrl)
-    local info, err = extractGitHubInfo(githubUrl)
-    if not info then
-        warn('Error:', err)
-        return
-    end
-
-
-    local commit, commitErr = getCommitHash(info.user, info.repo, info.branch)
-    if not commit then
-        warn('Error fetching commit:', commitErr)
-        return
-    end
-
-    print('Current Commit Information:')
-    print('  SHA:', commit.sha)
-    print('  Short SHA:', commit.shortSha)
-
-    return commit
-end
-
-
-Message.Text = `Currently Autofarming.\n———————————————————\nPickup speed: {getgenv().Settings.PickupDelay} seconds \nServer join time: {os.date("%I")}:{os.date("%M")} {os.date("%p")}\nServer Id: {game.JobId}\nMoney made since join: $0\nScript version: {getgenv().AutoHopVer}`
+local Message = Instance.new("Message",gethui())
+Message.Text =
+    `Currently Autofarming.\n———————————————————\nPickup speed: {getgenv().Settings.PickupDelay} seconds \nServer join time: {os.date(
+        '%I'
+    )}:{os.date('%M')} {os.date('%p')}\nServer Id: {game.JobId}\nMoney made since join: $0\nScript version: {getgenv().AutoHopVersion}`
 
 if getgenv().Settings.LowGFX then
-    game:GetService("RunService"):Set3dRenderingEnabled(false)
+    game:GetService('RunService'):Set3dRenderingEnabled(false)
 end
 
 --// 🔁 Server Hop Function
 local function serverHop()
     local gameId = game.PlaceId
-    local servers, cursor = {}, ""
+    local servers, cursor = {}, ''
 
     repeat
         local success, result = pcall(function()
             return game.HttpService:JSONDecode(
                 game:HttpGet(
-                    "https://games.roblox.com/v1/games/"
+                    'https://games.roblox.com/v1/games/'
                         .. gameId
-                        .. "/servers/Public?sortOrder=Asc&limit=100&cursor="
+                        .. '/servers/Public?sortOrder=Asc&limit=100&cursor='
                         .. cursor
                 )
             )
@@ -179,65 +99,65 @@ local function serverHop()
                     table.insert(servers, server.id)
                 end
             end
-            cursor = result.nextPageCursor or ""
+            cursor = result.nextPageCursor or ''
         else
             break
         end
-    until cursor == "" or #servers >= 1
+    until cursor == '' or #servers >= 1
 
     if #servers > 0 then
-        game:GetService("TeleportService")
+        game:GetService('TeleportService')
             :TeleportToPlaceInstance(
                 gameId,
                 servers[math.random(1, #servers)],
                 plr
             )
     else
-        warn("No available servers found.")
+        warn('No available servers found.')
     end
 end
 
-if readfile("YBA_AUTOHOP/lastJobId.txt") == tostring(game.JobId) then
-    printconsole("same server as last time.. hopping")
+if readfile('YBA_AUTOHOP/lastJobId.txt') == tostring(game.JobId) then
+    printconsole('same server as last time.. hopping')
     serverHop()
 end
 --// 📬 Webhook Notification Handler
 local function webHookHandler(Mode)
     local lCount = 1
     for _, item in pairs(plr.Backpack:GetChildren()) do
-        if item.Name == "Lucky Arrow" then
+        if item.Name == 'Lucky Arrow' then
             lCount += 1
         end
     end
 
     local textContent, titleContent, descriptionContent, colorContent, imageContent, thumbnailContent, footerContent
 
-    if Mode == "luckyArrow" then
+    if Mode == 'luckyArrow' then
         local req = request({
             Url = `https://thumbnails.roblox.com/v1/users/avatar-headshot?userIds={plr.UserId}&size=48x48&format=png`,
         })
-        local body = game:GetService("HttpService"):JSONDecode(req.Body)
+        local body = game:GetService('HttpService'):JSONDecode(req.Body)
 
         titleContent = plr.Name
-        descriptionContent = os.date("%I:%M %p")
+        descriptionContent = os.date('%I:%M %p')
         colorContent = 16776960
         imageContent = {
-            url = "https://static.wikia.nocookie.net/your-bizarre-adventure/images/f/fd/LuckyArrow.png/revision/latest?cb=20221020062009",
+            url = 'https://static.wikia.nocookie.net/your-bizarre-adventure/images/f/fd/LuckyArrow.png/revision/latest?cb=20221020062009',
         }
         thumbnailContent = { url = body.data[1].imageUrl }
 
         if
             getgenv().Settings.PingOnLuckyArrow
             and lCount >= 9
-            and readfile("YBA_AUTOHOP/lastLucky.txt") ~= plr.Name
+            and readfile('YBA_AUTOHOP/lastLucky.txt') ~= plr.Name
         then
-            writefile("YBA_AUTOHOP/lastLucky.txt", plr.Name)
+            writefile('YBA_AUTOHOP/lastLucky.txt', plr.Name)
             textContent =
                 `<@{getgenv().Settings.DiscordID}>, your account, {plr.Name} has ~9/9 lucky arrows`
         end
         footerContent = { text = `{lCount}/9 lucky arrows` }
-    elseif Mode == "prestige3" then
-        titleContent = "Possible Main acc detected!"
+    elseif Mode == 'prestige3' then
+        titleContent = 'Possible Main acc detected!'
         descriptionContent =
             `An account with the name of {plr.Name} is prestige 3+ and has been automatically kicked due to possibly being a main account.\n\nPlease go to your exploit"s workspace folder and navigate to YBA_AUTOHOP/whitelistedAccs.txt and add a new account`
         colorContent = 16711680
@@ -245,9 +165,9 @@ local function webHookHandler(Mode)
 
     request({
         Url = getgenv().Settings.URL,
-        Method = "POST",
-        Headers = { ["Content-Type"] = "application/json" },
-        Body = game:GetService("HttpService"):JSONEncode({
+        Method = 'POST',
+        Headers = { ['Content-Type'] = 'application/json' },
+        Body = game:GetService('HttpService'):JSONEncode({
             content = textContent,
             embeds = {
                 {
@@ -283,17 +203,22 @@ local function processInventory()
     end
 
     for name, item in pairs(uniqueItems) do
-        if name ~= "Lucky Arrow" and name ~= "Stand Arrow" then
+        if name ~= 'Lucky Arrow' and name ~= 'Stand Arrow' then
             task.wait(0.5)
             plr.Character.Humanoid:EquipTool(item)
-            plr.Character.RemoteEvent:FireServer("EndDialogue", {
-                NPC = "Merchant",
+            plr.Character.RemoteEvent:FireServer('EndDialogue', {
+                NPC = 'Merchant',
                 Option = Option,
-                Dialogue = "Dialogue5",
+                Dialogue = 'Dialogue5',
             })
         end
     end
-    Message.Text = `Currently Autofarming.\n———————————————————\nPickup speed: {getgenv().Settings.PickupDelay} seconds \nServer join time: {os.date("%I")}:{os.date("%M")} {os.date("%p")}\nServer Id: {game.JobId}\n Money made since join: ${tostring(math.clamp(GetCashSinceJoin(),0,9e9))}\nScript version: {getgenv().AutoHopVer}`
+    Message.Text =
+        `Currently Autofarming.\n———————————————————\nPickup speed: {getgenv().Settings.PickupDelay} seconds \nServer join time: {os.date(
+            '%I'
+        )}:{os.date('%M')} {os.date('%p')}\nServer Id: {game.JobId}\n Money made since join: ${tostring(
+            math.clamp(GetCashSinceJoin(), 0, 9e9)
+        )}\nScript version: {getgenv().AutoHopVersion}`
 end
 
 -- Auto Sell Inventory Every 12 Seconds
@@ -307,12 +232,12 @@ end)
 local function setup()
     -- Hook "Returner" InvokeServer call
     local old
-    old = hookmetamethod(game, "__namecall", function(self, ...)
+    old = hookmetamethod(game, '__namecall', function(self, ...)
         if
-            tostring(self) == "Returner"
-            and tostring(getnamecallmethod()) == "InvokeServer"
+            tostring(self) == 'Returner'
+            and tostring(getnamecallmethod()) == 'InvokeServer'
         then
-            return "  ___XP DE KEY"
+            return '  ___XP DE KEY'
         end
         return old(self, ...)
     end)
@@ -323,7 +248,7 @@ local function setup()
     setreadonly(vector3Metatable, false)
     vector3Metatable.__index = newcclosure(function(self, idx)
         if
-            string.lower(idx) == "magnitude"
+            string.lower(idx) == 'magnitude'
             and getcallingscript() == replicatedFirst.ItemSpawn
         then
             return 0
@@ -334,48 +259,48 @@ local function setup()
 
     -- Rename items based on their prompt text
     for _, item in pairs(itemSpawns:GetChildren()) do
-        local prox = item:WaitForChild("ProximityPrompt", 9)
+        local prox = item:WaitForChild('ProximityPrompt', 9)
         item.Name = prox.ObjectText
     end
 
     -- Handle newly spawned items
     itemSpawns.ChildAdded:Connect(function(item)
-        print("new item added to workspace")
-        local prox = item:WaitForChild("ProximityPrompt", 9)
+        print('new item added to workspace')
+        local prox = item:WaitForChild('ProximityPrompt', 9)
         item.Name = prox.ObjectText
         for _, v in pairs(itemSpawns:GetDescendants()) do
             if
-                v:IsA("ProximityPrompt")
+                v:IsA('ProximityPrompt')
                 and v.MaxActivationDistance == 0
-                and v.Name ~= "Proximity Prompt __"
+                and v.Name ~= 'Proximity Prompt __'
             then
-                v.Name = "ProximityPrompt __"
+                v.Name = 'ProximityPrompt __'
             end
         end
 
         for _, v in pairs(itemSpawns:GetChildren()) do
-            if not v:FindFirstChild("ProximityPrompt") then
+            if not v:FindFirstChild('ProximityPrompt') then
                 v:Destroy()
             end
         end
     end)
-    local res = readfile("YBA_AUTOHOP/whitelistedAccs.txt")
-    for i in string.gmatch(res, "[^\r\n]+") do
+    local res = readfile('YBA_AUTOHOP/whitelistedAccs.txt')
+    for i in string.gmatch(res, '[^\r\n]+') do
         table.insert(allowedAccs, i)
     end
 end
 local function checkForKickMessage()
-    local message = coregui:FindFirstChild("RobloxPromptGui")
-    if message and message:FindFirstChild("ErrorPrompt", true) then
+    local message = coregui:FindFirstChild('RobloxPromptGui')
+    if message and message:FindFirstChild('ErrorPrompt', true) then
         return true
     end
     return false
 end
 --// ▶️ Skip Loading Screen and Enter Game
-if not plr.Character:FindFirstChild("RemoteEvent") then
+if not plr.Character:FindFirstChild('RemoteEvent') then
     task.wait(1)
 end
-plr.Character.RemoteEvent:FireServer("PressedPlay")
+plr.Character.RemoteEvent:FireServer('PressedPlay')
 loaded = true
 task.spawn(function()
     --workspace:WaitForChild("LoadingScreen",90):WaitForChild("Song",90).SoundId = getcustomasset("YBA_AUTOHOP/theme.mp3")
@@ -389,7 +314,7 @@ repeat
 until loaded
 local console = loadstring(
     game:HttpGet(
-        "https://raw.githubusercontent.com/crcket/ROBLOX/refs/heads/main/crckonsle.lua"
+        'https://raw.githubusercontent.com/crcket/ROBLOX/refs/heads/main/crckonsle.lua'
     )
 )()
 -- Kick if Prestige 3+ (possible main)
@@ -397,14 +322,14 @@ if
     plr.PlayerStats.Prestige.Value >= 3
     and not table.find(allowedAccs, plr.Name)
 then
-    webHookHandler("prestige3")
-    plr:Kick("MAIN ACC DETECTED!")
+    webHookHandler('prestige3')
+    plr:Kick('MAIN ACC DETECTED!')
 end
 task.wait(12)
 setup()
-print("ran setup")
+print('ran setup')
 task.spawn(function()
-    console.Send(`ran setup @ {game.JobId}!`, "ANNOUNCEMENT")
+    console.Send(`ran setup @ {game.JobId}!`, 'ANNOUNCEMENT')
 end)
 --// 🧲 Auto Pickup Logic
 local isNotOnAlready = true
@@ -412,28 +337,28 @@ local lastPickupTime = tick()
 itemSpawns.ChildAdded:Connect(function(item)
     repeat
         task.wait()
-    until item.Name ~= "Model"
+    until item.Name ~= 'Model'
         and isNotOnAlready
         and not plr.Character.HumanoidRootPart.Anchored
     if
         getgenv().Settings.AutoFarm
         and item.PrimaryPart
-        and item:FindFirstChild("ProximityPrompt __")
+        and item:FindFirstChild('ProximityPrompt __')
     then
         print(`-> picking up {item.Name}!`)
         task.spawn(function()
-            console.Send(`picking up {item.Name}!`, "ITEM_PICKUP")
+            console.Send(`picking up {item.Name}!`, 'ITEM_PICKUP')
         end)
         lastPickupTime = tick()
         isNotOnAlready = false
         plr.Character.HumanoidRootPart.CFrame = item.PrimaryPart.CFrame
         task.wait(getgenv().Settings.PickupDelay or 0.2)
-        firesignal(item:FindFirstChildWhichIsA("ProximityPrompt").Triggered)
+        firesignal(item:FindFirstChildWhichIsA('ProximityPrompt').Triggered)
         spawn(function()
             task.wait((getgenv().Settings.PickupDelay or 0.2) + 0.5)
             if item.Parent then
                 firesignal(
-                    item:FindFirstChildWhichIsA("ProximityPrompt").Triggered
+                    item:FindFirstChildWhichIsA('ProximityPrompt').Triggered
                 )
                 task.wait((getgenv().Settings.PickupDelay or 0.2) + 0.5)
                 if item.Parent then
@@ -441,7 +366,7 @@ itemSpawns.ChildAdded:Connect(function(item)
                     task.spawn(function()
                         console.Send(
                             `{item.Name} took too long to pick up.. deleting`,
-                            "ITEM_TIMEOUT"
+                            'ITEM_TIMEOUT'
                         )
                     end)
                 end
@@ -455,21 +380,21 @@ end)
 
 --// 🧾 Auto Sell When "Message" Pops Up
 plrGui.ChildAdded:Connect(function(thing)
-    if thing.Name == "Message" then
+    if thing.Name == 'Message' then
         task.wait()
         local itemName = thing
-            :WaitForChild("TextLabel").Text
-            :match("%d+%s+(.+) in your inventory")
-            :gsub("%(s%)$", "")
+            :WaitForChild('TextLabel').Text
+            :match('%d+%s+(.+) in your inventory')
+            :gsub('%(s%)$', '')
         local item = plr.Backpack:FindFirstChild(itemName)
         if item then
             item.Parent = plr.Character
         end
 
-        plr.Character.RemoteEvent:FireServer("EndDialogue", {
-            NPC = "Merchant",
+        plr.Character.RemoteEvent:FireServer('EndDialogue', {
+            NPC = 'Merchant',
             Option = Option,
-            Dialogue = "Dialogue5",
+            Dialogue = 'Dialogue5',
         })
     end
 end)
@@ -479,7 +404,7 @@ plr.PlayerStats.Money.Changed:Connect(function()
     if not luckyBought and plr.PlayerStats.Money.Value >= 75_000 then
         local luckyNum = 0
         for _, v in pairs(plr.Backpack:GetChildren()) do
-            if v.Name == "Lucky Arrow" then
+            if v.Name == 'Lucky Arrow' then
                 luckyNum += 1
             end
         end
@@ -487,27 +412,27 @@ plr.PlayerStats.Money.Changed:Connect(function()
             luckyBought = true
             task.wait(1)
             plr.Character.RemoteEvent:FireServer(
-                "PurchaseShopItem",
-                { ItemName = "1x Lucky Arrow" }
+                'PurchaseShopItem',
+                { ItemName = '1x Lucky Arrow' }
             )
-            webHookHandler("luckyArrow")
-            local log = `{plr.Name} {os.date("%I:%M %p")}\n`
+            webHookHandler('luckyArrow')
+            local log = `{plr.Name} {os.date('%I:%M %p')}\n`
             writefile(
-                "YBA_AUTOHOP/Count.txt",
-                readfile("YBA_AUTOHOP/Count.txt") .. log
+                'YBA_AUTOHOP/Count.txt',
+                readfile('YBA_AUTOHOP/Count.txt') .. log
             )
         else
             luckyBought = true
             if getgenv().Settings.PingOnLuckyArrow then
-                warn(readfile("YBA_AUTOHOP/lastLucky.txt"))
-                if readfile("YBA_AUTOHOP/lastLucky.txt") == plr.Name then
+                warn(readfile('YBA_AUTOHOP/lastLucky.txt'))
+                if readfile('YBA_AUTOHOP/lastLucky.txt') == plr.Name then
                 else
-                    webHookHandler("luckyArrow")
+                    webHookHandler('luckyArrow')
                 end
-                warn("didthislucksend")
+                warn('didthislucksend')
             end
             getgenv().Settings.SellAll = false
-            Option = "Option1"
+            Option = 'Option1'
         end
     end
 end)
@@ -520,7 +445,7 @@ task.spawn(function()
                 serverHop()
                 task.wait(3)
             end)
-            game:GetService("TeleportService"):Teleport(game.PlaceId)
+            game:GetService('TeleportService'):Teleport(game.PlaceId)
         end
     end
 end)
