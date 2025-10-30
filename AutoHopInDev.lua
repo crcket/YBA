@@ -1,5 +1,5 @@
 -- this is the DEV version of autohop
-
+local devverurl = "https://raw.githubusercontent.com/crcket/YBA/refs/heads/main/AutoHopInDev.lua"
 repeat
     task.wait()
 until game:IsLoaded()
@@ -62,11 +62,96 @@ until game:IsLoaded()
     and plr.PlayerGui
     and plr:FindFirstChild("PlayerStats")
 
+
+local function extractGitHubInfo(url)
+    local user, repo, ref =
+        url:match('githubusercontent%.com/([^/]+)/([^/]+)/(.+)')
+
+    if not user or not repo or not ref then
+        return nil, 'Invalid GitHub URL format'
+    end
+    local branch = ref:match('refs/heads/([^/]+)')
+    local remainingPath = ref:match('refs/heads/[^/]+/(.+)')
+
+    if not branch then
+        branch = ref:match('^([a-f0-9]+)')
+        remainingPath = ref:match('^[a-f0-9]+/(.+)')
+    end
+
+    return {
+        user = user,
+        repo = repo,
+        branch = branch or 'main',
+        path = remainingPath or ref,
+        fullRef = ref,
+    }
+end
+
+local function getCommitHash(user, repo, branch)
+    local apiUrl = string.format(
+        'https://api.github.com/repos/%s/%s/commits/%s',
+        user,
+        repo,
+        branch
+    )
+
+    local response = request({
+        Url = apiUrl,
+        Method = 'GET',
+        Headers = {
+            ['User-Agent'] = 'GTC',
+        },
+    })
+
+    if not response.Success then
+        return nil,
+            'Failed to fetch commit info: ' .. tostring(response.StatusCode)
+    end
+
+    local data = game:GetService('HttpService'):JSONDecode(response.Body)
+
+    if data.sha then
+        return {
+            sha = data.sha,
+            shortSha = data.sha:sub(1, 7),
+            message = data.commit.message,
+            author = data.commit.author.name,
+            date = data.commit.author.date,
+            url = data.html_url,
+        }
+    end
+
+    return nil, 'Could not parse commit data'
+end
+
+-- Main function
+local function checkCommit(githubUrl)
+    local info, err = extractGitHubInfo(githubUrl)
+    if not info then
+        warn('Error:', err)
+        return
+    end
+
+
+    local commit, commitErr = getCommitHash(info.user, info.repo, info.branch)
+    if not commit then
+        warn('Error fetching commit:', commitErr)
+        return
+    end
+
+    print('Current Commit Information:')
+    print('  SHA:', commit.sha)
+    print('  Short SHA:', commit.shortSha)
+
+    return commit
+end
+
+
 local Message = Instance.new("Message", gethui())
 Message.Text =
     `Currently Autofarming.\n———————————————————\n Pickup speed: {getgenv().Settings.PickupDelay} seconds \n Server join time: {os.date(
         "%I"
-    )}:{os.date("%M")} {os.date("%p")}\n Server Id: {game.JobId}\n Money made since join: $0`
+    )}:{os.date("%M")} {os.date("%p")}\n Server Id: {game.JobId}\n Money made since join: $0\n Script version: {checkCommit(devverurl).shortSha}`
 
 if getgenv().Settings.LowGFX then
     game:GetService("RunService"):Set3dRenderingEnabled(false)
@@ -218,7 +303,7 @@ local function processInventory()
             "%I"
         )}:{os.date("%M")} {os.date("%p")}\n Server Id: {game.JobId}\n Money made since join: ${tostring(
             math.clamp(GetCashSinceJoin(),0,9e9)
-        )}`
+        )}\n Script version: {checkCommit(devverurl).shortSha}`
 end
 
 -- Auto Sell Inventory Every 12 Seconds
@@ -449,5 +534,4 @@ task.spawn(function()
         end
     end
 end)
-
 
