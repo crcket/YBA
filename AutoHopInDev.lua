@@ -441,7 +441,12 @@ end)
 task.spawn(function()
     while task.wait(0.5) do
         if tick() - lastPickupTime > 10 * 2 or checkForKickMessage() then -- 10*2 to account for 0.5
+            task.spawn(function()
+                serverHop()
+                task.wait(3)
+            end
             game:GetService("TeleportService"):Teleport(game.PlaceId)
         end
     end
 end)
+
