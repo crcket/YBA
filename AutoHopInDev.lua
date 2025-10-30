@@ -1,5 +1,4 @@
 -- this is the DEV version of autohop
-local devverurl = "https://raw.githubusercontent.com/crcket/YBA/refs/heads/main/AutoHopInDev.lua"
 repeat
     task.wait()
 until game:IsLoaded()
@@ -147,11 +146,7 @@ local function checkCommit(githubUrl)
 end
 
 
-local Message = Instance.new("Message", gethui())
-Message.Text =
-    `Currently Autofarming.\n———————————————————\n Pickup speed: {getgenv().Settings.PickupDelay} seconds \n Server join time: {os.date(
-        "%I"
-    )}:{os.date("%M")} {os.date("%p")}\n Server Id: {game.JobId}\n Money made since join: $0\n Script version: {checkCommit(devverurl).shortSha}`
+Message.Text = `Currently Autofarming.\n———————————————————\nPickup speed: {getgenv().Settings.PickupDelay} seconds \nServer join time: {os.date("%I")}:{os.date("%M")} {os.date("%p")}\nServer Id: {game.JobId}\nMoney made since join: $0\nScript version: {getgenv().AutoHopVer}`
 
 if getgenv().Settings.LowGFX then
     game:GetService("RunService"):Set3dRenderingEnabled(false)
@@ -298,12 +293,7 @@ local function processInventory()
             })
         end
     end
-    Message.Text =
-        `Currently Autofarming.\n———————————————————\n Pickup speed: {getgenv().Settings.PickupDelay} seconds \n Server join time: {os.date(
-            "%I"
-        )}:{os.date("%M")} {os.date("%p")}\n Server Id: {game.JobId}\n Money made since join: ${tostring(
-            math.clamp(GetCashSinceJoin(),0,9e9)
-        )}\n Script version: {checkCommit(devverurl).shortSha}`
+    Message.Text = `Currently Autofarming.\n———————————————————\nPickup speed: {getgenv().Settings.PickupDelay} seconds \nServer join time: {os.date("%I")}:{os.date("%M")} {os.date("%p")}\nServer Id: {game.JobId}\n Money made since join: ${tostring(math.clamp(GetCashSinceJoin(),0,9e9))}\nScript version: {getgenv().AutoHopVer}`
 end
 
 -- Auto Sell Inventory Every 12 Seconds
@@ -534,4 +524,3 @@ task.spawn(function()
         end
     end
 end)
-
