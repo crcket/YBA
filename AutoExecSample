@@ -5,8 +5,7 @@ getgenv().Settings = {
     PingOnLuckyArrow = true; -- pings your acc when you reach 9 lucky arrows
     LowGFX = true;
     DiscordID = YOURDISCORDIDHERE; -- self explanatory
+    DevMode = false; -- could be broken dev mode
     URL = "DISCORDWEBHOOKHERE"
 }
--- dev URL: https://raw.githubusercontent.com/crcket/YBA/refs/heads/main/AutoHopInDev.lua
--- normal URL: https://raw.githubusercontent.com/crcket/YBA/refs/heads/main/AutoHop.lua
-loadstring(request({Url = "https://raw.githubusercontent.com/crcket/YBA/refs/heads/main/AutoHop.lua"}).Body)()
+loadstring(request({Url = "https://raw.githubusercontent.com/crcket/YBA/refs/heads/main/AutoHop_Centralized.lua"}).Body)()
