@@ -7,4 +7,4 @@ else
     ExecuteUrl = "https://raw.githubusercontent.com/crcket/YBA/refs/heads/main/AutoHop.lua" -- redundancy
 end
 getgenv().AutoHopVersion = CheckFunc(ExecuteUrl)
-loadstring(request({Url = Url}).Body)()
+loadstring(request({Url = ExecuteUrl}).Body)()
