@@ -5,7 +5,9 @@ until game:IsLoaded()
 if game.PlaceId ~= 2809202155 then
     return
 end
-
+if not getgenv().Settings.AutoFarm then
+    return
+end
 --// 📦 Services & Variables
 local replicatedFirst = game:GetService('ReplicatedFirst')
 local replicatedStorage = game:GetService('ReplicatedStorage')
@@ -302,13 +304,6 @@ if not plr.Character:FindFirstChild('RemoteEvent') then
 end
 plr.Character.RemoteEvent:FireServer('PressedPlay')
 loaded = true
-task.spawn(function()
-    --workspace:WaitForChild("LoadingScreen",90):WaitForChild("Song",90).SoundId = getcustomasset("YBA_AUTOHOP/theme.mp3")
-end)
---// 🚀 Start Automation
-if not getgenv().Settings.AutoFarm then
-    return
-end
 repeat
     task.wait(0.5)
 until loaded
@@ -449,3 +444,4 @@ task.spawn(function()
         end
     end
 end)
+
