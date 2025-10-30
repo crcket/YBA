@@ -267,9 +267,12 @@ local function setup()
 
     -- Handle newly spawned items
     itemSpawns.ChildAdded:Connect(function(item)
-        print('new item added to workspace')
         local prox = item:WaitForChild('ProximityPrompt', 9)
         item.Name = prox.ObjectText
+        task.wait()
+        if item.Name:find("Candy") then
+            item:Destroy()
+        end
         for _, v in pairs(itemSpawns:GetDescendants()) do
             if
                 v:IsA('ProximityPrompt')
@@ -282,6 +285,9 @@ local function setup()
 
         for _, v in pairs(itemSpawns:GetChildren()) do
             if not v:FindFirstChild('ProximityPrompt') then
+                v:Destroy()
+            end
+            if v.Name:find("Candy") then
                 v:Destroy()
             end
         end
@@ -444,3 +450,4 @@ task.spawn(function()
         end
     end
 end)
+
