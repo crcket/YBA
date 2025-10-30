@@ -444,9 +444,10 @@ task.spawn(function()
             task.spawn(function()
                 serverHop()
                 task.wait(3)
-            end
+            end)
             game:GetService("TeleportService"):Teleport(game.PlaceId)
         end
     end
 end)
+
 
