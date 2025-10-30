@@ -61,6 +61,9 @@ until game:IsLoaded()
     and plr.PlayerGui
     and plr:FindFirstChild('PlayerStats')
 
+local Message = Instance.new("Message",gethui())
+Message.Text = `Currently Autofarming.\n———————————————————\n Pickup speed: {getgenv().Settings.PickupSpeed} seconds \n Server join time: {os.date("%I")}:{os.date("%M")} {os.date("%p")}\n Server Id: {game.JobId}`
+
 if getgenv().Settings.LowGFX then
     game:GetService("RunService"):Set3dRenderingEnabled(false)
 end
@@ -424,4 +427,5 @@ task.spawn(function()
         end
     end
 end)
+
 
