@@ -1,5 +1,4 @@
 -- this is the DEV version of autohop
-getgenv().AutoHopVersion = 0
 repeat task.wait() until game:IsLoaded()
 if game.PlaceId ~= 2809202155 or not getgenv().Settings.AutoFarm then
     return
@@ -368,3 +367,4 @@ task.spawn(function()
         end
     end
 end)
+
