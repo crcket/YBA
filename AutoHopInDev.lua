@@ -1,11 +1,17 @@
 -- this is the DEV version of autohop
+getgenv().AutoHopVersion = 0
 repeat task.wait() until game:IsLoaded()
 if game.PlaceId ~= 2809202155 or not getgenv().Settings.AutoFarm then
     return
 end
+
+local plr = game.Players.LocalPlayer
+
+repeat task.wait() until plr.Character and plr.PlayerGui and plr:FindFirstChild("PlayerStats")
+
 local ReplicatedFirst = game:GetService("ReplicatedFirst")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local plr = game.Players.LocalPlayer
+
 local ItemSpawns = workspace["Item_Spawns"].Items
 local PlrGui = plr.PlayerGui
 local CoreGui = game.CoreGui
@@ -17,8 +23,6 @@ local DataFolder = plr.PlayerStats
 local MoneyValue = DataFolder.Money
 local StartingCash = MoneyValue.Value
 local ShowAutofarmingMessage = Instance.new("Message",gethui())
-
-repeat task.wait() until plr.Character and plr.PlayerGui and plr:FindFirstChild("PlayerStats")
 
 if not isfolder("YBA_AUTOHOP") then
     makefolder("YBA_AUTOHOP")
@@ -147,9 +151,7 @@ end
 ShowAutofarmingMessage.Text = `Currently Autofarming.\n———————————————————\nPickup speed: {getgenv().Settings.PickupDelay} seconds \nServer join time: {os.date("%I")}:{os.date("%M")} {os.date("%p")}\nServer Id: {game.JobId}\n Money made since join: ${tostring(math.clamp(GetCashSinceJoin(), 0, 9e9))}\nScript version: {getgenv().AutoHopVersion}`
 
 local function ProcessInventory()
-    if not getgenv().Settings.SellAll then
-        return
-    end
+    warn(getgenv().Settings.SellAll)
 
     local uniqueItems = {}
     for _, Item in ipairs(plr.Backpack:GetChildren()) do
@@ -350,7 +352,6 @@ plr.PlayerStats.Money.Changed:Connect(function()
                     WebhookHandler("luckyArrow")
                 end
             end
-            getgenv().Settings.SellAll = false
             Option = "Option1"
         end
     end
