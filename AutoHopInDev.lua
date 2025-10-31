@@ -1,10 +1,8 @@
 -- this is the DEV version of autohop
 repeat task.wait() until game:IsLoaded()
-
-if game.PlaceId ~= 2809202155 or not getgenv().Settings.Autofarm hen
+if game.PlaceId ~= 2809202155 or not getgenv().Settings.AutoFarm then
     return
 end
-
 local ReplicatedFirst = game:GetService("ReplicatedFirst")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local plr = game.Players.LocalPlayer
@@ -14,13 +12,13 @@ local CoreGui = game.CoreGui
 --local Loaded = false
 local Option = getgenv().Settings.SellAll and "Option2" or "Option1"
 local LuckyBought = false
-local allowedAccs = {}
+local AllowedAccounts = {}
 local DataFolder = plr.PlayerStats
 local MoneyValue = DataFolder.Money
 local StartingCash = MoneyValue.Value
+local ShowAutofarmingMessage = Instance.new("Message",gethui())
 
 repeat task.wait() until plr.Character and plr.PlayerGui and plr:FindFirstChild("PlayerStats")
-
 
 if not isfolder("YBA_AUTOHOP") then
     makefolder("YBA_AUTOHOP")
@@ -37,7 +35,6 @@ end
 if not isfile("YBA_AUTOHOP/lastJobId.txt") then
     writefile("YBA_AUTOHOP/lastJobId.txt", tostring(game.JobId))
 end
-
 
 if getgenv().Settings.LowGFX then
     game:GetService("RunService"):Set3dRenderingEnabled(false)
@@ -143,10 +140,11 @@ local function WebhookHandler(Mode)
     })
 end
 
-
-local function GetCashSinceJoin()
+function GetCashSinceJoin()
     return MoneyValue.Value - StartingCash
 end
+
+ShowAutofarmingMessage.Text = `Currently Autofarming.\n———————————————————\nPickup speed: {getgenv().Settings.PickupDelay} seconds \nServer join time: {os.date("%I")}:{os.date("%M")} {os.date("%p")}\nServer Id: {game.JobId}\n Money made since join: ${tostring(math.clamp(GetCashSinceJoin(), 0, 9e9))}\nScript version: {getgenv().AutoHopVersion}`
 
 local function ProcessInventory()
     if not getgenv().Settings.SellAll then
@@ -169,12 +167,12 @@ local function ProcessInventory()
             })
         end
     end
-    Message.Text =`Currently Autofarming.\n———————————————————\nPickup speed: {getgenv().Settings.PickupDelay} seconds \nServer join time: {os.date("%I")}:{os.date("%M")} {os.date("%p")}\nServer Id: {game.JobId}\n Money made since join: ${tostring(math.clamp(GetCashSinceJoin(), 0, 9e9))}\nScript version: {getgenv().AutoHopVersion}`
+    ShowAutofarmingMessage.Text =`Currently Autofarming.\n———————————————————\nPickup speed: {getgenv().Settings.PickupDelay} seconds \nServer join time: {os.date("%I")}:{os.date("%M")} {os.date("%p")}\nServer Id: {game.JobId}\n Money made since join: ${tostring(math.clamp(GetCashSinceJoin(), 0, 9e9))}\nScript version: {getgenv().AutoHopVersion}`
 end
 
--- Auto Sell Inventory Every 12 Seconds
+-- Auto Sell Inventory Every 5 Seconds
 task.spawn(function()
-    while task.wait(12) do
+    while task.wait(5) do
         ProcessInventory()
     end
 end)
@@ -204,14 +202,14 @@ local function Setup()
 
     -- Rename Items based on their prompt text
     for _, Item in pairs(ItemSpawns:GetChildren()) do
-        local prox = Item:WaitForChild("ProximityPrompt", 9)
+        local prox = Item:WaitForChild("ProximityPrompt", 5)
         Item.Name = prox.ObjectText
     end
 
     -- Handle newly spawned Items
     ItemSpawns.ChildAdded:Connect(function(Item)
         print("new Item added to workspace")
-        local prox = Item:Child("ProximityPrompt", 9)
+        local prox = Item:WaitForChild("ProximityPrompt", 5)
         Item.Name = prox.ObjectText
         for _, v in pairs(ItemSpawns:GetDescendants()) do
             if v:IsA("ProximityPrompt") and v.MaxActivationDistance == 0 and v.Name ~= "Proximity Prompt __"
@@ -228,7 +226,7 @@ local function Setup()
     end)
     local Result = readfile("YBA_AUTOHOP/whitelistedAccs.txt")
     for i in string.gmatch(Result, "[^\r\n]+") do
-        table.insert(allowedAccs, i)
+        table.insert(AllowedAccounts, i)
     end
 end
 local function CheckForKickMsg()
@@ -250,15 +248,14 @@ local console = loadstring(
     )
 )()
 -- Kick if Prestige 3+ (possible main)
-if plr.PlayerStats.Prestige.Value >= 3 and not table.find(allowedAccs, plr.Name) then
+if plr.PlayerStats.Prestige.Value >= 3 and not table.find(AllowedAccounts, plr.Name) then
     WebhookHandler("prestige3")
     plr:Kick("MAIN ACC DETECTED!")
 end
-task.wait(5)
 Setup()
 print("ran Setup")
 task.spawn(function()
-    console.Send(`ran Setup @ {game.JobId}!`, "ANNOUNCEMENT")
+    console.Send(`Ran setup @ {game.JobId}!`, "ANNOUNCEMENT")
 end)
 
 local NotOnAlready = true
@@ -282,10 +279,12 @@ ItemSpawns.ChildAdded:Connect(function(Item)
         NotOnAlready = false
         plr.Character.HumanoidRootPart.CFrame = Item.PrimaryPart.CFrame
         task.wait(getgenv().Settings.PickupDelay or 0.2)
-        firesignal(Item:FindFirstChildWhichIsA("ProximityPrompt").Triggered)
+        if Item then
+            firesignal(Item:FindFirstChildWhichIsA("ProximityPrompt").Triggered)
+        end
         spawn(function()
             task.wait((getgenv().Settings.PickupDelay or 0.2) + 0.5)
-            if Item.Parent then
+            if Item.Parent and Item then
                 firesignal(Item:FindFirstChildWhichIsA("ProximityPrompt").Triggered)
                 task.wait((getgenv().Settings.PickupDelay or 0.2) + 0.5)
                 if Item.Parent then
@@ -305,7 +304,10 @@ end)
 PlrGui.ChildAdded:Connect(function(thing)
     if thing.Name == "Message" then
         task.wait()
-        local ItemName = thing:WaitForChild("TextLabel").Text:match("%d+%s+(.+) in your inventory"):gsub("%(s%)$", "")
+        local ItemName = thing:WaitForChild("TextLabel",1)
+        if thing then
+            ItemName = ItemName.Text:match("%d+%s+(.+) in your inventory"):gsub("%(s%)$", "")
+        end
         local Item = plr.Backpack:FindFirstChild(ItemName)
         if Item then
             Item.Parent = plr.Character
@@ -356,7 +358,7 @@ end)
 
 task.spawn(function()
     while task.wait(0.5) do
-        if tick() - LastPickupTime > 10 * 2 or CheckForKickMsg() then -- 10*2 to account for 0.5
+        if tick() - LastPickupTime > 10 * 2 or CheckForKickMsg() then
             task.spawn(function()
                 HopServer()
                 task.wait(3)
