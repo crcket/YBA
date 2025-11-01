@@ -1,4 +1,4 @@
--- this is the DEV version of autohop
+-- this is the DEV version of autohop lol
 repeat task.wait() until game:IsLoaded()
 if game.PlaceId ~= 2809202155 or not getgenv().Settings.AutoFarm then
     return
