@@ -20,6 +20,8 @@ local MoneyValue = DataFolder.Money
 local StartingCash = MoneyValue.Value
 local ShowAutofarmingMessage = Instance.new("Message",gethui())
 
+local ItemCollectionConsole = loadstring(game:HttpGet("https://raw.githubusercontent.com/crcket/ROBLOX/refs/heads/main/crckonsle.lua"))()
+
 if not isfolder("YBA_AUTOHOP") then
     makefolder("YBA_AUTOHOP")
 end
@@ -245,7 +247,6 @@ if not plr.Character:FindFirstChild("RemoteEvent") then
 end
 plr.Character.RemoteEvent:FireServer("PressedPlay")
 
-local ItemCollectionConsole = loadstring(game:HttpGet("https://raw.githubusercontent.com/crcket/ROBLOX/refs/heads/main/crckonsle.lua"))()
 -- Kick if Prestige 3+ (possible main)
 if plr.PlayerStats.Prestige.Value >= 3 and not table.find(AllowedAccounts, plr.Name) then
     WebhookHandler("prestige3")
