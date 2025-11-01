@@ -1,4 +1,4 @@
--- Yhis is the RELEASE version of autohop!
+-- This is the RELEASE version of autohop!
 repeat task.wait() until game:IsLoaded()
 
 if game.PlaceId ~= 2809202155 or not getgenv().Settings.AutoFarm then
@@ -170,6 +170,11 @@ end
 
 -- Auto Sell Inventory Every 5 Seconds
 
+task.spawn(function()
+    while task.wait(5) do
+        ProcessInventory()
+    end
+end)
 
 local function Setup()
     local old
@@ -299,6 +304,7 @@ PlrGui.ChildAdded:Connect(function(Thing)
             Option = Option,
             Dialogue = "Dialogue5",
         })
+        ProcessInventory()
     end
 end)
 

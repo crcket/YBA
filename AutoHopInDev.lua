@@ -170,6 +170,11 @@ end
 
 -- Auto Sell Inventory Every 5 Seconds
 
+task.spawn(function()
+    while task.wait(5) do
+        ProcessInventory()
+    end
+end)
 
 local function Setup()
     local old
@@ -299,6 +304,7 @@ PlrGui.ChildAdded:Connect(function(Thing)
             Option = Option,
             Dialogue = "Dialogue5",
         })
+        ProcessInventory()
     end
 end)
 
