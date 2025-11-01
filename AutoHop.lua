@@ -1,20 +1,17 @@
---nd
+-- Yhis is the RELEASE version of autohop!
 repeat task.wait() until game:IsLoaded()
+
 if game.PlaceId ~= 2809202155 or not getgenv().Settings.AutoFarm then
     return
 end
 
 local plr = game.Players.LocalPlayer
-
 repeat task.wait() until plr.Character and plr.PlayerGui and plr:FindFirstChild("PlayerStats")
-
 local ReplicatedFirst = game:GetService("ReplicatedFirst")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-
 local ItemSpawns = workspace["Item_Spawns"].Items
 local PlrGui = plr.PlayerGui
 local CoreGui = game.CoreGui
---local Loaded = false
 local Option = getgenv().Settings.SellAll and "Option2" or "Option1"
 local LuckyBought = false
 local AllowedAccounts = {}
@@ -44,41 +41,41 @@ if getgenv().Settings.LowGFX then
 end
 
 local function HopServer()
-    local gameId = game.PlaceId
-    local servers, cursor = {}, ""
-
+    local PlaceId = game.PlaceId
+    local Servers, Cursor = {}, ""
+    
     repeat
-        local success, result = pcall(function()
+        local Success, Result = pcall(function()
             return game.HttpService:JSONDecode(
                 game:HttpGet(
                     "https://games.roblox.com/v1/games/"
-                        .. gameId
-                        .. "/servers/Public?sortOrder=Asc&limit=100&cursor="
-                        .. cursor
+                        .. PlaceId
+                        .. "/Servers/Public?sortOrder=Asc&limit=100&Cursor="
+                        .. Cursor
                 )
             )
         end)
 
-        if success and result and result.data then
-            for _, server in ipairs(result.data) do
+        if Success and Result and Result.data then
+            for _, Server in ipairs(Result.data) do
                 if
-                    server.playing >= 14
-                    and server.playing < server.maxPlayers
-                    and server.id ~= game.JobId
+                    Server.playing >= 14
+                    and Server.playing < Server.maxPlayers
+                    and Server.id ~= game.JobId
                 then
-                    table.insert(servers, server.id)
+                    table.insert(Servers, Server.id)
                 end
             end
-            cursor = result.nextPageCursor or ""
+            Cursor = Result.nextPageCursor or ""
         else
             break
         end
-    until cursor == "" or #servers >= 1
+    until Cursor == "" or #Servers >= 1
 
-    if #servers > 0 then
-        game:GetService("TeleportService"):TeleportToPlaceInstance(gameId,servers[math.random(1, #servers)],plr)
+    if #Servers > 0 then
+        game:GetService("TeleportService"):TeleportToPlaceInstance(PlaceId,Servers[math.random(1, #Servers)],plr)
     else
-        warn("No available servers found.")
+        warn("No available Servers found.")
     end
 end
 
@@ -87,14 +84,14 @@ if readfile("YBA_AUTOHOP/lastJobId.txt") == tostring(game.JobId) then
 end
 
 local function WebhookHandler(Mode)
-    local lCount = 1
+    local LuckyCount = 1
     for _, Item in pairs(plr.Backpack:GetChildren()) do
         if Item.Name == "Lucky Arrow" then
-            lCount += 1
+            LuckyCount += 1
         end
     end
     local textContent, titleContent, descriptionContent, colorContent, imageContent, thumbnailContent, footerContent
-    if Mode == "luckyArrow" then
+    if Mode == "LuckyArrow" then
         local req = request({
             Url = `https://thumbnails.roblox.com/v1/users/avatar-headshot?userIds={plr.UserId}&size=48x48&format=png`,
         })
@@ -110,13 +107,13 @@ local function WebhookHandler(Mode)
 
         if
             getgenv().Settings.PingOnLuckyArrow
-            and lCount >= 9
+            and LuckyCount >= 9
             and readfile("YBA_AUTOHOP/lastLucky.txt") ~= plr.Name
         then
             writefile("YBA_AUTOHOP/lastLucky.txt", plr.Name)
             textContent =`<@{getgenv().Settings.DiscordID}>, your account ({plr.Name}) has around 9/9 lucky arrows`
         end
-        footerContent = { text = `{lCount}/9 lucky arrows` }
+        footerContent = { text = `{LuckyCount}/9 lucky arrows` }
     elseif Mode == "prestige3" then
         titleContent = "Possible Main acc detected!"
         descriptionContent = `An account with the name of {plr.Name} is prestige 3+ and has been automatically kicked due to possibly being a main account.\n\nPlease go to your exploit"s workspace folder and navigate to YBA_AUTOHOP/whitelistedAccs.txt and add a new account`
@@ -172,11 +169,7 @@ local function ProcessInventory()
 end
 
 -- Auto Sell Inventory Every 5 Seconds
-task.spawn(function()
-    while task.wait(5) do
-        ProcessInventory()
-    end
-end)
+
 
 local function Setup()
     local old
@@ -243,11 +236,7 @@ if not plr.Character:FindFirstChild("RemoteEvent") then
 end
 plr.Character.RemoteEvent:FireServer("PressedPlay")
 
-local console = loadstring(
-    game:HttpGet(
-        "https://raw.githubusercontent.com/crcket/ROBLOX/refs/heads/main/crckonsle.lua"
-    )
-)()
+local ItemCollectionConsole = loadstring(game:HttpGet("https://raw.githubusercontent.com/crcket/ROBLOX/refs/heads/main/crckonsle.lua"))()
 -- Kick if Prestige 3+ (possible main)
 if plr.PlayerStats.Prestige.Value >= 3 and not table.find(AllowedAccounts, plr.Name) then
     WebhookHandler("prestige3")
@@ -256,25 +245,17 @@ end
 Setup()
 print("ran Setup")
 task.spawn(function()
-    console.Send(`Ran setup @ {game.JobId}!`, "ANNOUNCEMENT")
+    ItemCollectionConsole.Send(`Ran setup @ {game.JobId}!`, "ANNOUNCEMENT")
 end)
 
 local NotOnAlready = true
 local LastPickupTime = tick()
 ItemSpawns.ChildAdded:Connect(function(Item)
-    repeat
-        task.wait()
-    until Item.Name ~= "Model"
-        and NotOnAlready
-        and not plr.Character.HumanoidRootPart.Anchored
-    if
-        getgenv().Settings.AutoFarm
-        and Item.PrimaryPart
-        and Item:FindFirstChild("ProximityPrompt __")
-    then
+    repeat task.wait() until Item.Name ~= "Model" and NotOnAlready and not plr.Character.HumanoidRootPart.Anchored
+    if getgenv().Settings.AutoFarm and Item.PrimaryPart and Item:FindFirstChild("ProximityPrompt __") then
         print(`-> picking up {Item.Name}!`)
         task.spawn(function()
-            console.Send(`picking up {Item.Name}!`, "ITEM_PICKUP")
+            ItemCollectionConsole.Send(`picking up {Item.Name}!`, "ITEM_PICKUP")
         end)
         LastPickupTime = tick()
         NotOnAlready = false
@@ -291,7 +272,7 @@ ItemSpawns.ChildAdded:Connect(function(Item)
                 if Item.Parent then
                     Item.Parent = nil
                     task.spawn(function()
-                        console.Send(`{Item.Name} took too long to pick up.. deleting`,"ITEM_TIMEOUT")
+                        ItemCollectionConsole.Send(`{Item.Name} took too long to pick up.. deleting`,"ITEM_TIMEOUT")
                     end)
                 end
             end
@@ -302,11 +283,11 @@ ItemSpawns.ChildAdded:Connect(function(Item)
     end
 end)
 
-PlrGui.ChildAdded:Connect(function(thing)
-    if thing.Name == "Message" then
+PlrGui.ChildAdded:Connect(function(Thing)
+    if Thing.Name == "Message" then
         task.wait()
-        local ItemName = thing:WaitForChild("TextLabel",1)
-        if thing then
+        local ItemName = Thing:WaitForChild("TextLabel",1)
+        if Thing then
             ItemName = ItemName.Text:match("%d+%s+(.+) in your inventory"):gsub("%(s%)$", "")
         end
         local Item = plr.Backpack:FindFirstChild(ItemName)
@@ -336,11 +317,11 @@ plr.PlayerStats.Money.Changed:Connect(function()
                 "PurchaseShopItem",
                 { ItemName = "1x Lucky Arrow" }
             )
-            WebhookHandler("luckyArrow")
-            local log = `{plr.Name} {os.date("%I:%M %p")}\n`
+            WebhookHandler("LuckyArrow")
+            local NameAndTime = `{plr.Name} {os.date("%I:%M %p")}\n`
             writefile(
                 "YBA_AUTOHOP/Count.txt",
-                readfile("YBA_AUTOHOP/Count.txt") .. log
+                readfile("YBA_AUTOHOP/Count.txt") .. NameAndTime
             )
         else
             LuckyBought = true
@@ -348,7 +329,7 @@ plr.PlayerStats.Money.Changed:Connect(function()
                 warn(readfile("YBA_AUTOHOP/lastLucky.txt"))
                 if readfile("YBA_AUTOHOP/lastLucky.txt") == plr.Name then
                 else
-                    WebhookHandler("luckyArrow")
+                    WebhookHandler("LuckyArrow")
                 end
             end
             Option = "Option1"
