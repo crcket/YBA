@@ -147,6 +147,7 @@ end
 ShowAutofarmingMessage.Text = `Currently Autofarming.\n———————————————————\nPickup speed: {getgenv().Settings.PickupDelay} seconds \nServer join time: {os.date("%I")}:{os.date("%M")} {os.date("%p")}\nServer Id: {game.JobId}\n Money made since join: ${tostring(math.clamp(GetCashSinceJoin(), 0, 9e9))}\nScript version: {getgenv().AutoHopVersion}`
 
 local function ProcessInventory()
+    task.wait()
     warn(getgenv().Settings.SellAll)
 
     local uniqueItems = {}
