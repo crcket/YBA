@@ -148,6 +148,7 @@ ShowAutofarmingMessage.Text = `Currently Autofarming.\n————————�
 
 local function ProcessInventory()
     task.wait()
+    ItemCollectionConsole.Send(`Sold items.`, "ANNOUNCEMENT")
     warn(getgenv().Settings.SellAll)
 
     local uniqueItems = {}
