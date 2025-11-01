@@ -149,7 +149,6 @@ end
 ShowAutofarmingMessage.Text = `Currently Autofarming.\n———————————————————\nPickup speed: {getgenv().Settings.PickupDelay} seconds \nServer join time: {os.date("%I")}:{os.date("%M")} {os.date("%p")}\nServer Id: {game.JobId}\n Money made since join: ${tostring(math.clamp(GetCashSinceJoin(), 0, 9e9))}\nScript version: {getgenv().AutoHopVersion}`
 
 local function ProcessInventory()
-    task.wait()
     task.spawn(function()
         ItemCollectionConsole.Send(`Sold items.`, "ANNOUNCEMENT")
     end)
@@ -304,12 +303,12 @@ PlrGui.ChildAdded:Connect(function(Thing)
         if Item then
             Item.Parent = plr.Character
         end
+        ProcessInventory()
         plr.Character.RemoteEvent:FireServer("EndDialogue", {
             NPC = "Merchant",
             Option = Option,
             Dialogue = "Dialogue5",
         })
-        ProcessInventory()
     end
 end)
 
