@@ -1,4 +1,4 @@
--- This is the RELEASE version of autohop!
+-- This is the DEV version of autohop!
 repeat task.wait() until game:IsLoaded()
 
 if game.PlaceId ~= 2809202155 or not getgenv().Settings.AutoFarm then
@@ -19,6 +19,8 @@ local DataFolder = plr.PlayerStats
 local MoneyValue = DataFolder.Money
 local StartingCash = MoneyValue.Value
 local ShowAutofarmingMessage = Instance.new("Message",gethui())
+
+local ItemCollectionConsole = loadstring(game:HttpGet("https://raw.githubusercontent.com/crcket/ROBLOX/refs/heads/main/crckonsle.lua"))()
 
 if not isfolder("YBA_AUTOHOP") then
     makefolder("YBA_AUTOHOP")
@@ -147,6 +149,9 @@ end
 ShowAutofarmingMessage.Text = `Currently Autofarming.\n———————————————————\nPickup speed: {getgenv().Settings.PickupDelay} seconds \nServer join time: {os.date("%I")}:{os.date("%M")} {os.date("%p")}\nServer Id: {game.JobId}\n Money made since join: ${tostring(math.clamp(GetCashSinceJoin(), 0, 9e9))}\nScript version: {getgenv().AutoHopVersion}`
 
 local function ProcessInventory()
+    task.spawn(function()
+        ItemCollectionConsole.Send(`Sold items.`, "ANNOUNCEMENT")
+    end)
     warn(getgenv().Settings.SellAll)
 
     local uniqueItems = {}
@@ -241,7 +246,6 @@ if not plr.Character:FindFirstChild("RemoteEvent") then
 end
 plr.Character.RemoteEvent:FireServer("PressedPlay")
 
-local ItemCollectionConsole = loadstring(game:HttpGet("https://raw.githubusercontent.com/crcket/ROBLOX/refs/heads/main/crckonsle.lua"))()
 -- Kick if Prestige 3+ (possible main)
 if plr.PlayerStats.Prestige.Value >= 3 and not table.find(AllowedAccounts, plr.Name) then
     WebhookHandler("prestige3")
@@ -299,12 +303,12 @@ PlrGui.ChildAdded:Connect(function(Thing)
         if Item then
             Item.Parent = plr.Character
         end
+        ProcessInventory()
         plr.Character.RemoteEvent:FireServer("EndDialogue", {
             NPC = "Merchant",
             Option = Option,
             Dialogue = "Dialogue5",
         })
-        ProcessInventory()
     end
 end)
 
