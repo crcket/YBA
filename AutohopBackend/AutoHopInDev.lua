@@ -8,7 +8,6 @@ end
 local plr = game.Players.LocalPlayer
 repeat task.wait() until plr.Character and plr.PlayerGui and plr:FindFirstChild("PlayerStats")
 local ReplicatedFirst = game:GetService("ReplicatedFirst")
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ItemSpawns = workspace["Item_Spawns"].Items
 local PlrGui = plr.PlayerGui
 local CoreGui = game.CoreGui
@@ -19,7 +18,7 @@ local DataFolder = plr.PlayerStats
 local MoneyValue = DataFolder.Money
 local StartingCash = MoneyValue.Value
 local ShowAutofarmingMessage = Instance.new("Message",gethui())
-
+local JoinTime = `{os.date("%I")}:{os.date("%M")}`
 local ItemCollectionConsole = loadstring(game:HttpGet("https://raw.githubusercontent.com/crcket/ROBLOX/refs/heads/main/crckonsle.lua"))()
 
 if not isfolder("YBA_AUTOHOP") then
@@ -146,7 +145,7 @@ function GetCashSinceJoin()
     return MoneyValue.Value - StartingCash
 end
 
-ShowAutofarmingMessage.Text = `Currently Autofarming.\n———————————————————\nPickup speed: {getgenv().Settings.PickupDelay} seconds \nServer join time: {os.date("%I")}:{os.date("%M")} {os.date("%p")}\nServer Id: {game.JobId}\n Money made since join: ${tostring(math.clamp(GetCashSinceJoin(), 0, 9e9))}\nScript version: {getgenv().AutoHopVersion}`
+ShowAutofarmingMessage.Text = `Currently Autofarming.\n———————————————————\nPickup speed: {getgenv().Settings.PickupDelay} seconds \nServer join time: {JoinTime} {os.date("%p")}\nServer Id: {game.JobId}\n Money made since join: ${tostring(math.clamp(GetCashSinceJoin(), 0, 9e9))}\nScript version: {getgenv().AutoHopVersion}`
 
 local function ProcessInventory()
     task.spawn(function()
@@ -170,7 +169,7 @@ local function ProcessInventory()
             })
         end
     end
-    ShowAutofarmingMessage.Text =`Currently Autofarming.\n———————————————————\nPickup speed: {getgenv().Settings.PickupDelay} seconds \nServer join time: {os.date("%I")}:{os.date("%M")} {os.date("%p")}\nServer Id: {game.JobId}\n Money made since join: ${tostring(math.clamp(GetCashSinceJoin(), 0, 9e9))}\nScript version: {getgenv().AutoHopVersion}`
+    ShowAutofarmingMessage.Text =`Currently Autofarming.\n———————————————————\nPickup speed: {getgenv().Settings.PickupDelay} seconds \nServer join time: {JoinTime} {os.date("%p")}\nServer Id: {game.JobId}\n Money made since join: ${tostring(math.clamp(GetCashSinceJoin(), 0, 9e9))}\nScript version: {getgenv().AutoHopVersion}`
 end
 
 -- Auto Sell Inventory Every 5 Seconds
