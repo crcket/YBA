@@ -117,7 +117,7 @@ local function WebhookHandler(Mode)
         footerContent = { text = `{LuckyCount}/9 lucky arrows` }
     elseif Mode == "prestige3" then
         titleContent = "Possible Main acc detected!"
-        descriptionContent = `An account with the name of {plr.Name} is prestige 3+ and has been automatically kicked due to possibly being a main account.\n\nPlease go to your exploit"s workspace folder and navigate to YBA_AUTOHOP/whitelistedAccs.txt and add a new account`
+        descriptionContent = `An account with the name of {plr.Name} is prestige 3+ and has been automatically kicked due to possibly being a main account.\n\nPlease go to your exploit's workspace folder and navigate to YBA_AUTOHOP/whitelistedAccs.txt and add a new account`
         colorContent = 16711680
     end
 
@@ -253,7 +253,7 @@ end
 Setup()
 print("ran Setup")
 task.spawn(function()
-    ItemCollectionConsole.Send(`Ran setup @ {game.JobId}!`, "ANNOUNCEMENT")
+    ItemCollectionConsole.Send(`Ran setup on server {game.JobId}!`, "ANNOUNCEMENT")
 end)
 
 local NotOnAlready = true
