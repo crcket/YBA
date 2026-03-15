@@ -41,48 +41,7 @@ if getgenv().Settings.LowGFX then
     game:GetService("RunService"):Set3dRenderingEnabled(false)
 end
 
-local function HopServer()
-    local PlaceId = game.PlaceId
-    local Servers, Cursor = {}, ""
-    
-    repeat
-        local Success, Result = pcall(function()
-            return game.HttpService:JSONDecode(
-                game:HttpGet(
-                    "https://games.roblox.com/v1/games/"
-                        .. PlaceId
-                        .. "/Servers/Public?sortOrder=Asc&limit=100&Cursor="
-                        .. Cursor
-                )
-            )
-        end)
 
-        if Success and Result and Result.data then
-            for _, Server in ipairs(Result.data) do
-                if
-                    Server.playing >= 14
-                    and Server.playing < Server.maxPlayers
-                    and Server.id ~= game.JobId
-                then
-                    table.insert(Servers, Server.id)
-                end
-            end
-            Cursor = Result.nextPageCursor or ""
-        else
-            break
-        end
-    until Cursor == "" or #Servers >= 1
-
-    if #Servers > 0 then
-        game:GetService("TeleportService"):TeleportToPlaceInstance(PlaceId,Servers[math.random(1, #Servers)],plr)
-    else
-        warn("No available Servers found.")
-    end
-end
-
-if readfile("YBA_AUTOHOP/lastJobId.txt") == tostring(game.JobId) then
-    HopServer()
-end
 
 local function WebhookHandler(Mode)
     local LuckyCount = 1
@@ -350,10 +309,10 @@ task.spawn(function()
     while task.wait(0.5) do
         if tick() - LastPickupTime > 5 * 2 or CheckForKickMsg() then
             task.spawn(function()
-                HopServer()
+                loadstring(game:HttpGet("https://raw.githubusercontent.com/Cesare0328/my-scripts/refs/heads/main/CachedServerhop.lua"))()
                 task.wait(3)
             end)
-            game:GetService("TeleportService"):Teleport(game.PlaceId)
+            loadstring(game:HttpGet("https://raw.githubusercontent.com/Cesare0328/my-scripts/refs/heads/main/CachedServerhop.lua"))()
         end
     end
 end)
