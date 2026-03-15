@@ -348,7 +348,7 @@ end)
 
 task.spawn(function()
     while task.wait(0.5) do
-        if tick() - LastPickupTime > 10 * 2 or CheckForKickMsg() then
+        if tick() - LastPickupTime > 5 * 2 or CheckForKickMsg() then
             task.spawn(function()
                 HopServer()
                 task.wait(3)
