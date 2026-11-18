@@ -132,10 +132,11 @@ local function ProcessInventory()
             local Continue = DialogueGui:WaitForChild("ClickContinue",1)
             firesignal(Continue.MouseButton1Click)
             
-            for i=1,3 do
+            for i=1,4 do
             Continue = DialogueGui:WaitForChild("ClickContinue",1)
             task.wait(0.2)
             firesignal(Continue.MouseButton1Click)
+            if i==4 then break end
             local Options = DialogueGui:WaitForChild("Options")
             local Option1 = Options:WaitForChild("Option1").TextButton
             if i == 3 then
