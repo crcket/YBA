@@ -119,7 +119,7 @@ local function ProcessInventory()
 
     for name, Item in pairs(uniqueItems) do
         if name ~= "Lucky Arrow" and name ~= "Stand Arrow" then
-            task.wait(0.5)
+            task.wait(1.5)
             plr.Character.Humanoid:EquipTool(Item)
 
             local MerchantEvent = plr.Character.RemoteEvent
