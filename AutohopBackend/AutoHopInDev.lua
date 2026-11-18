@@ -121,11 +121,30 @@ local function ProcessInventory()
         if name ~= "Lucky Arrow" and name ~= "Stand Arrow" then
             task.wait(0.5)
             plr.Character.Humanoid:EquipTool(Item)
-            plr.Character.RemoteEvent:FireServer("EndDialogue", {
-                NPC = "Merchant",
-                Option = Option,
-                Dialogue = "Dialogue5",
-            })
+
+            local MerchantEvent = plr.Character.RemoteEvent
+
+            MerchantEvent:FireServer(
+                "PromptTriggered",
+                game:GetService("ReplicatedStorage").Dialogue.Merchant
+            )
+            local DialogueGui = PlrGui:WaitForChild("DialogueGui"):WaitForChild("Frame")
+            local Continue = DialogueGui:WaitForChild("ClickContinue",1)
+            firesignal(Continue.MouseButton1Click)
+            
+            for i=1,3 do
+            Continue = DialogueGui:WaitForChild("ClickContinue",1)
+            task.wait(0.2)
+            firesignal(Continue.MouseButton1Click)
+            local Options = DialogueGui:WaitForChild("Options")
+            local Option1 = Options:WaitForChild("Option1").TextButton
+            if i == 3 then
+            	local Option6 = Options:WaitForChild("Option6").TextButton
+            	firesignal(Option6.MouseButton1Click)
+            	else firesignal(Option1.MouseButton1Click)
+            	end
+            end
+            
         end
     end
     ShowAutofarmingMessage.Text =`Currently Autofarming.\n———————————————————\nPickup speed: {getgenv().Settings.PickupDelay} seconds \nServer join time: {JoinTime} {os.date("%p")}\nServer Id: {game.JobId}\n Money made since join: ${tostring(math.clamp(GetCashSinceJoin(), 0, 9e9))}\nScript version: {getgenv().AutoHopVersion}`
